@@ -26,7 +26,7 @@
         body { background-color: var(--bg-body); color: var(--text-main); font-family: var(--font-sans); height: 100vh; overflow: hidden; }
         
         /* UTILS */
-        .app-container { max-width: 500px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; background: var(--bg-body); }
+        .app-container { max-width: 500px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; background: var(--bg-body); position: relative; }
         .flex-center { display: flex; align-items: center; justify-content: center; }
         .btn { border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 16px; width: 100%; cursor: pointer; transition: transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn:active { transform: scale(0.97); }
@@ -58,9 +58,13 @@
         .zone-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: transparent; color: var(--text-main); font-weight: 700; font-size: 12px; cursor: pointer; }
         .zone-btn.active { background: var(--primary); color: white; shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-        /* LOBBY */
+        /* LOBBY & MODAL */
         .input-lg { font-size: 24px; padding: 16px; text-align: center; border: 2px solid #E5E7EB; border-radius: 12px; width: 100%; outline: none; font-weight: 700; letter-spacing: 2px; }
         .input-lg:focus { border-color: var(--primary); }
+
+        .modal-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px; backdrop-filter: blur(2px); }
+        .modal-content { background: white; padding: 24px; border-radius: 16px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); animation: popIn 0.2s ease-out; }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -71,23 +75,23 @@
         import { getFirestore, collection, addDoc, doc, updateDoc, onSnapshot, getDoc, setDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
         
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyCw3_nIjjDYUo-lVpV7qtj6Kdn9dbPM0dE",
-  authDomain: "caddieroulette-9f6b4.firebaseapp.com",
-  projectId: "caddieroulette-9f6b4",
-  storageBucket: "caddieroulette-9f6b4.firebasestorage.app",
-  messagingSenderId: "108668982333",
-  appId: "1:108668982333:web:0f5eabea5caec6ab844654"
-};
-
+        // --- YOUR CONFIG ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyCw3_nIjjDYUo-lVpV7qtj6Kdn9dbPM0dE",
+          authDomain: "caddieroulette-9f6b4.firebaseapp.com",
+          projectId: "caddieroulette-9f6b4",
+          storageBucket: "caddieroulette-9f6b4.firebasestorage.app",
+          messagingSenderId: "108668982333",
+          appId: "1:108668982333:web:0f5eabea5caec6ab844654"
+        };
 
         const app = initializeApp(firebaseConfig);
         window.db = getFirestore(app);
         window.auth = getAuth(app);
         window.provider = new GoogleAuthProvider();
-        window.ops = { collection, addDoc, doc, updateDoc, onSnapshot, getDoc, setDoc, arrayUnion, increment, signInWithPopup, signOut };
+        
+        // --- FIX: Added onAuthStateChanged to this list ---
+        window.ops = { collection, addDoc, doc, updateDoc, onSnapshot, getDoc, setDoc, arrayUnion, increment, signInWithPopup, signOut, onAuthStateChanged };
     </script>
 
     <script type="text/babel">
@@ -113,6 +117,23 @@ const firebaseConfig = {
         };
 
         // --- COMPONENTS ---
+        const Modal = ({ isOpen, title, message, onClose, type = 'neutral' }) => {
+            if (!isOpen) return null;
+            const headerColor = type === 'error' ? '#DC2626' : (type === 'success' ? '#166534' : '#1F2937');
+            
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()}>
+                        <div style={{fontSize: 48, marginBottom: 10}}>
+                            {type === 'error' ? '🏌️‍♂️⚠️' : (type === 'success' ? '🎉' : 'ℹ️')}
+                        </div>
+                        <h3 style={{color: headerColor, fontSize: 20, fontWeight: 800, marginBottom: 8}}>{title}</h3>
+                        <p style={{color: '#4B5563', marginBottom: 20, lineHeight: 1.5}}>{message}</p>
+                        <button className="btn btn-primary" onClick={onClose}>GOT IT</button>
+                    </div>
+                </div>
+            );
+        };
 
         const Spinner = ({ isSpinning, currentText, zone }) => {
             return (
@@ -148,9 +169,9 @@ const firebaseConfig = {
 
         const SoundManager = {
             playTick: () => {
-                const audio = new Audio("https://cdn.freesound.org/previews/256/256113_3263906-lq.mp3"); // Short tick
+                const audio = new Audio("https://cdn.freesound.org/previews/256/256113_3263906-lq.mp3");
                 audio.volume = 0.2;
-                audio.play().catch(e => {}); // Ignore interaction errors
+                audio.play().catch(e => {});
             }
         };
 
@@ -162,6 +183,9 @@ const firebaseConfig = {
             const [zone, setZone] = useState("TEE");
             const [localSpinText, setLocalSpinText] = useState("WAITING...");
             const [isSpinning, setIsSpinning] = useState(false);
+            
+            // Modal State
+            const [modal, setModal] = useState({ open: false, title: "", message: "", type: "neutral" });
 
             useEffect(() => {
                 const unsub = window.ops.onAuthStateChanged(window.auth, (u) => {
@@ -171,18 +195,14 @@ const firebaseConfig = {
                 return () => unsub();
             }, []);
 
-            // LISTEN TO GAME CHANGES
             useEffect(() => {
                 if (!gameCode) return;
                 const unsub = window.ops.onSnapshot(window.ops.doc(window.db, "games", gameCode), (doc) => {
                     if (doc.exists()) {
                         const data = doc.data();
                         setGameData(data);
-                        
-                        // Handle Remote Spin Animation
                         if (data.isSpinning) {
                             setIsSpinning(true);
-                            // Quick random flash effect locally while "spinning" state is true in DB
                             const interval = setInterval(() => {
                                 const list = CHALLENGES[data.zone || 'TEE'];
                                 setLocalSpinText(list[Math.floor(Math.random() * list.length)]);
@@ -200,7 +220,6 @@ const firebaseConfig = {
 
             useEffect(() => { lucide.createIcons(); }, [user, gameData]);
 
-            // ACTIONS
             const handleLogin = async () => { await window.ops.signInWithPopup(window.auth, window.provider); };
 
             const createGame = async () => {
@@ -218,6 +237,10 @@ const firebaseConfig = {
 
             const joinGame = async (codeInput) => {
                 const code = codeInput.toUpperCase();
+                if(code.length !== 4) {
+                     setModal({ open: true, title: "Invalid Code", message: "Please enter a 4-character room code.", type: "error" });
+                     return;
+                }
                 const ref = window.ops.doc(window.db, "games", code);
                 const snap = await window.ops.getDoc(ref);
                 if (snap.exists()) {
@@ -229,16 +252,13 @@ const firebaseConfig = {
                     }
                     setGameCode(code);
                 } else {
-                    alert("Game not found!");
+                    setModal({ open: true, title: "Game Not Found", message: "That room code doesn't exist. Check with the host.", type: "error" });
                 }
             };
 
             const handleSpin = async () => {
-                // 1. Set Spinning State in DB (Triggers animation for everyone)
                 const ref = window.ops.doc(window.db, "games", gameCode);
                 await window.ops.updateDoc(ref, { isSpinning: true, zone: zone });
-
-                // 2. Wait 2 seconds then set result
                 setTimeout(async () => {
                     const list = CHALLENGES[zone];
                     const result = list[Math.floor(Math.random() * list.length)];
@@ -247,8 +267,6 @@ const firebaseConfig = {
             };
 
             const addPoint = async (uid) => {
-                // We need to update the array object. Firestore array update is tricky, 
-                // so we read, modify, write for simplicity in this prototype.
                 const ref = window.ops.doc(window.db, "games", gameCode);
                 const snap = await window.ops.getDoc(ref);
                 const data = snap.data();
@@ -259,7 +277,6 @@ const firebaseConfig = {
                 await window.ops.updateDoc(ref, { players: newPlayers });
             };
 
-            // RENDER
             if (loading) return <div className="app-container flex-center">Loading...</div>;
 
             if (!user) return (
@@ -275,6 +292,8 @@ const firebaseConfig = {
 
             if (!gameCode) return (
                 <div className="app-container">
+                    <Modal isOpen={modal.open} title={modal.title} message={modal.message} type={modal.type} onClose={() => setModal({...modal, open: false})} />
+                    
                     <div className="header"><div className="header-title">LOBBY</div></div>
                     <div className="game-content" style={{justifyContent:'center'}}>
                          <div className="card" style={{textAlign:'center'}}>
@@ -300,6 +319,8 @@ const firebaseConfig = {
 
             return (
                 <div className="app-container">
+                    <Modal isOpen={modal.open} title={modal.title} message={modal.message} type={modal.type} onClose={() => setModal({...modal, open: false})} />
+
                     <div className="header">
                         <div style={{display:'flex', flexDirection:'column'}}>
                             <div style={{fontSize:10, opacity:0.8, fontWeight:700}}>ROOM CODE</div>
@@ -328,13 +349,11 @@ const firebaseConfig = {
                                 </button>
                             </div>
                         )}
-
                         {!isHost && isSpinning && (
                             <div className="card" style={{textAlign:'center', background:'#FEF3C7', color:'#B45309', fontWeight:700, marginBottom:20}}>
                                 Host is spinning...
                             </div>
                         )}
-
                         {/* PLAYERS */}
                         <PlayerList players={gameData?.players || []} onScore={addPoint} />
                     </div>
