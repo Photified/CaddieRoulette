@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Caddie Roulette</title>
+    
+    <link rel="manifest" href="./manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#166534">
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --primary: #166534; --accent: #FACC15; --danger: #DC2626;
+            --bg-body: #F3F4F6; --bg-card: #FFFFFF; --text-main: #1F2937;
+            --font-display: "Impact", "Arial Black", sans-serif;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body.dark-mode { --primary: #15803d; --bg-body: #111827; --bg-card: #1F2937; --text-main: #F9FAFB; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-body); color: var(--text-main); font-family: var(--font-sans); height: 100vh; overflow: hidden; }
+        
+        /* UTILS */
+        .app-container { max-width: 500px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; background: var(--bg-body); }
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+        .btn { border: none; padding: 16px; border-radius: 12px; font-weight: 700; font-size: 16px; width: 100%; cursor: pointer; transition: transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 0 #0f4523; }
+        .btn-accent { background: var(--accent); color: #422006; box-shadow: 0 4px 0 #ca8a04; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .card { background: var(--bg-card); padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 16px; }
+
+        /* HEADER */
+        .header { background: var(--primary); padding: 16px; color: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 10; }
+        .header-title { font-family: var(--font-display); font-size: 24px; letter-spacing: 1px; text-transform: uppercase; font-style: italic; }
+
+        /* GAME VIEWS */
+        .game-content { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; }
+        
+        /* ROULETTE CARD */
+        .roulette-box { 
+            background: #111827; color: #FACC15; border: 4px solid #FACC15; 
+            border-radius: 20px; padding: 30px 20px; text-align: center; 
+            min-height: 250px; display: flex; flex-direction: column; justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden;
+        }
+        .roulette-bg { position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0.1; background-image: repeating-linear-gradient(45deg, #FACC15 0, #FACC15 10px, transparent 10px, transparent 20px); }
+        .challenge-text { font-family: var(--font-display); font-size: 32px; text-transform: uppercase; line-height: 1.1; position: relative; z-index: 2; text-shadow: 2px 2px 0 #000; }
+        .zone-badge { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: #DC2626; color: white; padding: 4px 12px; border-radius: 20px; font-weight: 800; font-size: 10px; letter-spacing: 1px; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+
+        /* CONTROLS */
+        .zone-selector { display: flex; gap: 8px; margin-bottom: 20px; background: var(--bg-card); padding: 8px; border-radius: 12px; }
+        .zone-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: transparent; color: var(--text-main); font-weight: 700; font-size: 12px; cursor: pointer; }
+        .zone-btn.active { background: var(--primary); color: white; shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+        /* LOBBY */
+        .input-lg { font-size: 24px; padding: 16px; text-align: center; border: 2px solid #E5E7EB; border-radius: 12px; width: 100%; outline: none; font-weight: 700; letter-spacing: 2px; }
+        .input-lg:focus { border-color: var(--primary); }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, onSnapshot, getDoc, setDoc, arrayUnion, increment } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCw3_nIjjDYUo-lVpV7qtj6Kdn9dbPM0dE",
+  authDomain: "caddieroulette-9f6b4.firebaseapp.com",
+  projectId: "caddieroulette-9f6b4",
+  storageBucket: "caddieroulette-9f6b4.firebasestorage.app",
+  messagingSenderId: "108668982333",
+  appId: "1:108668982333:web:0f5eabea5caec6ab844654"
+};
+
+
+        const app = initializeApp(firebaseConfig);
+        window.db = getFirestore(app);
+        window.auth = getAuth(app);
+        window.provider = new GoogleAuthProvider();
+        window.ops = { collection, addDoc, doc, updateDoc, onSnapshot, getDoc, setDoc, arrayUnion, increment, signInWithPopup, signOut };
+    </script>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- GAME DATA ---
+        const CHALLENGES = {
+            TEE: [
+                "Driver off the Deck", "Hit it with your 7-Iron", "Eyes Closed Swing", 
+                "Happy Gilmore Swing", "Wrong Handed Swing", "Yell 'MASHED POTATOES' at impact",
+                "Tee it up extremely high", "No practice swing allowed", "Must hit a fade"
+            ],
+            FAIRWAY: [
+                "Club up 2 clubs, half swing", "Putter from the fairway", "Baseball Swing (no interlock grip)",
+                "One handed finish", "Must hit a low stinger", "Stand on one leg",
+                "Ask opponent to pick your club", "Aim 30 yards left, slice it back"
+            ],
+            GREEN: [
+                "Putt with your Wedge", "Billards Style (Pool Cue)", "Eyes Closed Putt",
+                "Opponent places your ball", "Putt with the pin in", "Must chip on the green",
+                "Lag putt only (must stop within 1ft or re-putt)"
+            ]
+        };
+
+        // --- COMPONENTS ---
+
+        const Spinner = ({ isSpinning, currentText, zone }) => {
+            return (
+                <div className="roulette-box">
+                    <div className="roulette-bg"></div>
+                    <div className="zone-badge">{zone} ZONE</div>
+                    <div className="challenge-text" style={{transform: isSpinning ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.1s'}}>
+                        {currentText}
+                    </div>
+                    {isSpinning && <div style={{fontSize:12, marginTop:10, color:'white', opacity:0.7}}>SPINNING...</div>}
+                </div>
+            );
+        };
+
+        const PlayerList = ({ players, onScore }) => (
+            <div className="card" style={{padding:0, overflow:'hidden'}}>
+                <div style={{background:'#F3F4F6', padding:'10px 16px', fontSize:11, fontWeight:800, color:'#6B7280', letterSpacing:1}}>LEADERBOARD</div>
+                {players.sort((a,b) => b.score - a.score).map((p, i) => (
+                    <div key={i} style={{display:'flex', alignItems:'center', padding:'12px 16px', borderBottom:'1px solid #E5E7EB'}}>
+                        <img src={p.photo} style={{width:36, height:36, borderRadius:'50%', marginRight:12, border:'2px solid var(--primary)'}} />
+                        <div style={{flex:1, fontWeight:600}}>
+                            {p.name}
+                            {i === 0 && <span style={{fontSize:12, marginLeft:8}}>👑</span>}
+                        </div>
+                        <div style={{fontSize:18, fontWeight:700, marginRight:16}}>{p.score}</div>
+                        <button onClick={() => onScore(p.uid)} style={{width:32, height:32, borderRadius:8, border:'none', background:'#D1FAE5', color:'#065F46', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer'}}>
+                            <i data-lucide="plus" size="16"></i>
+                        </button>
+                    </div>
+                ))}
+            </div>
+        );
+
+        const SoundManager = {
+            playTick: () => {
+                const audio = new Audio("https://cdn.freesound.org/previews/256/256113_3263906-lq.mp3"); // Short tick
+                audio.volume = 0.2;
+                audio.play().catch(e => {}); // Ignore interaction errors
+            }
+        };
+
+        function App() {
+            const [user, setUser] = useState(null);
+            const [gameCode, setGameCode] = useState("");
+            const [gameData, setGameData] = useState(null);
+            const [loading, setLoading] = useState(true);
+            const [zone, setZone] = useState("TEE");
+            const [localSpinText, setLocalSpinText] = useState("WAITING...");
+            const [isSpinning, setIsSpinning] = useState(false);
+
+            useEffect(() => {
+                const unsub = window.ops.onAuthStateChanged(window.auth, (u) => {
+                    setUser(u);
+                    setLoading(false);
+                });
+                return () => unsub();
+            }, []);
+
+            // LISTEN TO GAME CHANGES
+            useEffect(() => {
+                if (!gameCode) return;
+                const unsub = window.ops.onSnapshot(window.ops.doc(window.db, "games", gameCode), (doc) => {
+                    if (doc.exists()) {
+                        const data = doc.data();
+                        setGameData(data);
+                        
+                        // Handle Remote Spin Animation
+                        if (data.isSpinning) {
+                            setIsSpinning(true);
+                            // Quick random flash effect locally while "spinning" state is true in DB
+                            const interval = setInterval(() => {
+                                const list = CHALLENGES[data.zone || 'TEE'];
+                                setLocalSpinText(list[Math.floor(Math.random() * list.length)]);
+                                SoundManager.playTick();
+                            }, 100);
+                            return () => clearInterval(interval);
+                        } else {
+                            setIsSpinning(false);
+                            if(data.currentChallenge) setLocalSpinText(data.currentChallenge);
+                        }
+                    }
+                });
+                return () => unsub();
+            }, [gameCode]);
+
+            useEffect(() => { lucide.createIcons(); }, [user, gameData]);
+
+            // ACTIONS
+            const handleLogin = async () => { await window.ops.signInWithPopup(window.auth, window.provider); };
+
+            const createGame = async () => {
+                const code = Math.random().toString(36).substring(2, 6).toUpperCase();
+                await window.ops.setDoc(window.ops.doc(window.db, "games", code), {
+                    host: user.uid,
+                    players: [{ uid: user.uid, name: user.displayName.split(" ")[0], photo: user.photoURL, score: 0 }],
+                    currentChallenge: "READY TO PLAY",
+                    isSpinning: false,
+                    zone: "TEE",
+                    createdAt: new Date()
+                });
+                setGameCode(code);
+            };
+
+            const joinGame = async (codeInput) => {
+                const code = codeInput.toUpperCase();
+                const ref = window.ops.doc(window.db, "games", code);
+                const snap = await window.ops.getDoc(ref);
+                if (snap.exists()) {
+                    const players = snap.data().players || [];
+                    if (!players.find(p => p.uid === user.uid)) {
+                        await window.ops.updateDoc(ref, {
+                            players: window.ops.arrayUnion({ uid: user.uid, name: user.displayName.split(" ")[0], photo: user.photoURL, score: 0 })
+                        });
+                    }
+                    setGameCode(code);
+                } else {
+                    alert("Game not found!");
+                }
+            };
+
+            const handleSpin = async () => {
+                // 1. Set Spinning State in DB (Triggers animation for everyone)
+                const ref = window.ops.doc(window.db, "games", gameCode);
+                await window.ops.updateDoc(ref, { isSpinning: true, zone: zone });
+
+                // 2. Wait 2 seconds then set result
+                setTimeout(async () => {
+                    const list = CHALLENGES[zone];
+                    const result = list[Math.floor(Math.random() * list.length)];
+                    await window.ops.updateDoc(ref, { isSpinning: false, currentChallenge: result });
+                }, 2000);
+            };
+
+            const addPoint = async (uid) => {
+                // We need to update the array object. Firestore array update is tricky, 
+                // so we read, modify, write for simplicity in this prototype.
+                const ref = window.ops.doc(window.db, "games", gameCode);
+                const snap = await window.ops.getDoc(ref);
+                const data = snap.data();
+                const newPlayers = data.players.map(p => {
+                    if (p.uid === uid) return { ...p, score: p.score + 1 };
+                    return p;
+                });
+                await window.ops.updateDoc(ref, { players: newPlayers });
+            };
+
+            // RENDER
+            if (loading) return <div className="app-container flex-center">Loading...</div>;
+
+            if (!user) return (
+                <div className="app-container" style={{justifyContent:'center', padding:20, textAlign:'center'}}>
+                    <div style={{fontSize:60, marginBottom:10}}>🎰</div>
+                    <h1 style={{fontFamily:'var(--font-display)', fontSize:42, lineHeight:1, marginBottom:10}}>CADDIE<br/>ROULETTE</h1>
+                    <p style={{marginBottom:40, color:'#6B7280'}}>The ultimate golf party game.</p>
+                    <button className="btn btn-primary" onClick={handleLogin}>
+                        <i data-lucide="log-in"></i> Sign in with Google
+                    </button>
+                </div>
+            );
+
+            if (!gameCode) return (
+                <div className="app-container">
+                    <div className="header"><div className="header-title">LOBBY</div></div>
+                    <div className="game-content" style={{justifyContent:'center'}}>
+                         <div className="card" style={{textAlign:'center'}}>
+                            <img src={user.photoURL} style={{width:60, height:60, borderRadius:'50%', marginBottom:16, border:'3px solid var(--primary)'}}/>
+                            <h3>Hello, {user.displayName.split(" ")[0]}</h3>
+                            <div style={{margin:'20px 0', borderTop:'1px solid #E5E7EB'}}></div>
+                            
+                            <button className="btn btn-primary" onClick={createGame} style={{marginBottom:16}}>Start New Game</button>
+                            
+                            <div style={{margin:'20px 0', fontSize:12, fontWeight:800, color:'#9CA3AF'}}>OR JOIN FRIEND</div>
+                            <div style={{display:'flex', gap:8}}>
+                                <input id="codeInput" className="input-lg" placeholder="CODE" maxLength="4" />
+                                <button className="btn btn-accent" style={{width:'auto'}} onClick={() => joinGame(document.getElementById('codeInput').value)}>
+                                    <i data-lucide="arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const isHost = gameData && gameData.host === user.uid;
+
+            return (
+                <div className="app-container">
+                    <div className="header">
+                        <div style={{display:'flex', flexDirection:'column'}}>
+                            <div style={{fontSize:10, opacity:0.8, fontWeight:700}}>ROOM CODE</div>
+                            <div style={{fontFamily:'var(--font-display)', fontSize:24, letterSpacing:2}}>{gameCode}</div>
+                        </div>
+                        <div className="header-title" style={{fontSize:18}}>Roulette</div>
+                        <button onClick={() => { setGameCode(""); setGameData(null); }} style={{background:'transparent', border:'none', color:'white'}}><i data-lucide="log-out"></i></button>
+                    </div>
+
+                    <div className="game-content">
+                        {/* THE WHEEL */}
+                        <div style={{marginBottom:24}}>
+                            <Spinner isSpinning={isSpinning} currentText={localSpinText} zone={gameData?.zone || 'TEE'} />
+                        </div>
+
+                        {/* CONTROLS (HOST ONLY) */}
+                        {isHost && (
+                            <div style={{marginBottom:24}}>
+                                <div className="zone-selector">
+                                    {['TEE', 'FAIRWAY', 'GREEN'].map(z => (
+                                        <button key={z} className={`zone-btn ${zone === z ? 'active' : ''}`} onClick={() => setZone(z)}>{z}</button>
+                                    ))}
+                                </div>
+                                <button className="btn btn-accent" onClick={handleSpin} disabled={isSpinning} style={{fontSize:20, padding:20, opacity: isSpinning ? 0.5 : 1}}>
+                                    {isSpinning ? 'SPINNING...' : 'SPIN THE WHEEL'}
+                                </button>
+                            </div>
+                        )}
+
+                        {!isHost && isSpinning && (
+                            <div className="card" style={{textAlign:'center', background:'#FEF3C7', color:'#B45309', fontWeight:700, marginBottom:20}}>
+                                Host is spinning...
+                            </div>
+                        )}
+
+                        {/* PLAYERS */}
+                        <PlayerList players={gameData?.players || []} onScore={addPoint} />
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
