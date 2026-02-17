@@ -7,7 +7,7 @@
     
     <link rel="manifest" href="./manifest.json" />
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#064E3B">
+    <meta name="theme-color" content="#ffffff">
 
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -17,9 +17,8 @@
     <style>
         :root {
             --primary: #064E3B; --primary-light: #059669; --accent: #FACC15; 
-            --bg-gradient: linear-gradient(135deg, #064E3B 0%, #022c22 100%);
-            --glass: rgba(255, 255, 255, 0.95);
-            --glass-border: rgba(255, 255, 255, 0.2);
+            --bg-body: #064E3B; /* Deep Green Background */
+            --glass: #FFFFFF;
             --text-main: #1F2937;
             --font-display: "Impact", "Arial Black", sans-serif;
             --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -28,14 +27,15 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            background: var(--bg-gradient); 
+            background: var(--bg-body);
+            background-image: radial-gradient(circle at center, #065f46 0%, #022c22 100%);
             color: var(--text-main); 
             font-family: var(--font-sans); 
             height: 100vh; 
             overflow: hidden; 
         }
         
-        /* LAYOUT */
+        /* LAYOUT - CENTERING MAGIC */
         .app-container { 
             max-width: 500px; 
             margin: 0 auto; 
@@ -44,89 +44,155 @@
             flex-direction: column; 
             position: relative;
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            background: transparent;
         }
 
-        /* HEADER */
+        /* HEADER - WHITE & CENTERED */
         .header { 
-            background: rgba(6, 78, 59, 0.8); 
-            backdrop-filter: blur(10px);
-            padding: 12px 16px; 
-            color: white; 
+            background: #FFFFFF; 
+            height: 100px;
             display: flex; 
-            justify-content: space-between; 
+            justify-content: center; 
             align-items: center; 
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            z-index: 10; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 20; 
+            position: relative;
         }
-        .header-logo { height: 32px; width: 32px; margin-right: 10px; }
-        .header-title { font-family: var(--font-display); font-size: 20px; letter-spacing: 1px; text-transform: uppercase; font-style: italic; color: var(--accent); }
-        .header-btn { background: rgba(255,255,255,0.15); border: none; color: white; padding: 8px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; margin-left: 8px; }
-        .header-btn:active { background: rgba(255,255,255,0.3); }
+        
+        .header-logo { 
+            height: 80px; width: 80px; 
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));
+            transition: transform 0.2s;
+        }
+        .header-logo:active { transform: scale(0.95); }
 
-        /* CARDS & GLASS */
-        .game-content { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; }
+        .header-btn { 
+            position: absolute; right: 20px;
+            background: #F3F4F6; border: none; color: var(--primary); 
+            padding: 12px; border-radius: 50%; width: 48px; height: 48px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            transition: background 0.2s;
+        }
+        .header-btn:active { background: #E5E7EB; transform: scale(0.95); }
+
+        /* CONTENT - VERTICALLY CENTERED */
+        .game-content { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; /* This centers everything vertically */
+            align-items: stretch;
+        }
         
         .card { 
             background: var(--glass); 
             padding: 24px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
+            border-radius: 24px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
             margin-bottom: 20px; 
-            border: 1px solid var(--glass-border);
+            animation: slideUp 0.3s ease-out;
         }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         /* BUTTONS */
         .btn { 
-            border: none; padding: 16px; border-radius: 12px; 
+            border: none; padding: 18px; border-radius: 16px; 
             font-weight: 800; font-size: 16px; width: 100%; cursor: pointer; 
             transition: all 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; 
-            text-transform: uppercase; letter-spacing: 0.5px;
+            text-transform: uppercase; letter-spacing: 1px;
         }
-        .btn:active { transform: scale(0.96); }
+        .btn:active { transform: scale(0.98); }
         
         .btn-primary { 
             background: linear-gradient(to bottom, #10B981, #059669); 
             color: white; 
-            box-shadow: 0 4px 0 #064E3B; 
+            box-shadow: 0 6px 0 #064E3B; 
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
-        .btn-primary:active { box-shadow: 0 0 0 #064E3B; transform: translateY(4px); }
+        .btn-primary:active { box-shadow: 0 0 0 #064E3B; transform: translateY(6px); }
 
         .btn-accent { 
             background: linear-gradient(to bottom, #FACC15, #EAB308); 
             color: #422006; 
-            box-shadow: 0 4px 0 #854D0E; 
+            box-shadow: 0 6px 0 #854D0E; 
         }
-        .btn-accent:active { box-shadow: 0 0 0 #854D0E; transform: translateY(4px); }
+        .btn-accent:active { box-shadow: 0 0 0 #854D0E; transform: translateY(6px); }
 
-        .btn-danger { background: #fee2e2; color: #dc2626; }
+        .btn-danger { background: #fee2e2; color: #dc2626; font-weight: 700; box-shadow: none; }
         
-        /* ROULETTE BOX */
-        .roulette-box { 
-            background: #111827; color: #FACC15; border: 4px solid #FACC15; 
-            border-radius: 24px; padding: 30px 20px; text-align: center; 
-            min-height: 260px; display: flex; flex-direction: column; justify-content: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4); position: relative; overflow: hidden;
+        /* THE WHEEL UI */
+        .wheel-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 30px auto;
+            border-radius: 50%;
+            border: 8px solid #FACC15;
+            box-shadow: 0 0 0 4px #000, 0 20px 50px rgba(0,0,0,0.5);
+            background: #111827;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
-        .roulette-bg { position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0.1; background-image: repeating-linear-gradient(45deg, #FACC15 0, #FACC15 10px, transparent 10px, transparent 20px); }
-        .challenge-text { font-family: var(--font-display); font-size: 36px; text-transform: uppercase; line-height: 1.1; position: relative; z-index: 2; text-shadow: 3px 3px 0 #000; }
-        .zone-badge { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); background: #DC2626; color: white; padding: 6px 16px; border-radius: 20px; font-weight: 800; font-size: 11px; letter-spacing: 2px; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.5); border: 2px solid white; }
+
+        .wheel-spinner {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-conic-gradient(
+                #1F2937 0deg 20deg,
+                #374151 20deg 40deg
+            );
+            border-radius: 50%;
+            transition: transform 2s cubic-bezier(0.2, 0.8, 0.2, 1); /* Ease out stop */
+        }
+        .wheel-spinner.spinning {
+            animation: spin 0.5s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .wheel-center {
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            background: #111827;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            padding: 20px;
+            text-align: center;
+            border: 4px solid #FACC15;
+        }
+
+        .challenge-text { font-family: var(--font-display); font-size: 28px; text-transform: uppercase; line-height: 1.1; color: #FACC15; text-shadow: 2px 2px 0 #000; }
+        .zone-badge { position: absolute; top: -20px; background: #DC2626; color: white; padding: 6px 16px; border-radius: 20px; font-weight: 800; font-size: 11px; letter-spacing: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); border: 2px solid white; z-index: 10; }
+        
+        /* Pointer Triangle */
+        .wheel-pointer {
+            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0; 
+            border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid white;
+            z-index: 5; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+        }
 
         /* CONTROLS */
-        .zone-selector { display: flex; gap: 8px; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 14px; }
-        .zone-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; background: transparent; color: rgba(255,255,255,0.6); font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+        .zone-selector { display: flex; gap: 8px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 16px; }
+        .zone-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; background: transparent; color: rgba(255,255,255,0.6); font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; }
         .zone-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 
-        /* INPUTS & LOGOS */
+        /* INPUTS */
         .input-lg { font-size: 24px; padding: 16px; text-align: center; border: 2px solid #E5E7EB; border-radius: 12px; width: 100%; outline: none; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; background: #F9FAFB; }
         .input-lg:focus { border-color: var(--primary); background: white; }
         
-        .logo-main { width: 140px; height: 140px; margin-bottom: 20px; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.3)); animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
-
         /* MODAL */
-        .modal-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px; backdrop-filter: blur(4px); }
-        .modal-content { background: white; padding: 24px; border-radius: 20px; width: 100%; max-width: 320px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px; backdrop-filter: blur(8px); }
+        .modal-content { background: white; padding: 24px; border-radius: 24px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         /* SETTINGS PAGE */
@@ -136,6 +202,13 @@
         .toggle-switch.on { background: var(--primary-light); }
         .toggle-circle { width: 24px; height: 24px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .toggle-switch.on .toggle-circle { left: 24px; }
+
+        /* HOW TO GRID */
+        .howto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .howto-item { background: #F9FAFB; padding: 16px 10px; border-radius: 16px; text-align: center; border: 1px solid #E5E7EB; display: flex; flex-direction: column; align-items: center; }
+        .howto-icon-box { background: #DCFCE7; color: #166534; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+        .howto-text { font-size: 12px; font-weight: 700; color: #4B5563; line-height: 1.3; }
+        .section-title { font-size: 12px; font-weight: 800; color: #9CA3AF; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; text-align: left; }
     </style>
 </head>
 <body>
@@ -195,20 +268,20 @@
             return (
                 <div className="modal-overlay" onClick={onClose}>
                     <div className="modal-content" onClick={e => e.stopPropagation()} style={{textAlign:'left'}}>
-                        <h2 style={{fontFamily:'var(--font-display)', fontSize:24, marginBottom:20, borderBottom:'1px solid #E5E7EB', paddingBottom:10}}>SETTINGS</h2>
+                        <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20, borderBottom:'1px solid #E5E7EB', paddingBottom:10}}>
+                            <h2 style={{fontFamily:'var(--font-display)', fontSize:24, color:'#1F2937'}}>SETTINGS</h2>
+                            <button onClick={onClose} style={{border:'none', background:'transparent'}}><i data-lucide="x" color="#9CA3AF"></i></button>
+                        </div>
                         
-                        {/* HOW TO */}
-                        <div style={{marginBottom:20}}>
-                            <h4 style={{fontSize:12, fontWeight:800, color:'#9CA3AF', letterSpacing:1, marginBottom:8}}>HOW TO PLAY</h4>
-                            <ul style={{fontSize:14, color:'#4B5563', paddingLeft:20, lineHeight:1.6}}>
-                                <li>Host creates a game room.</li>
-                                <li>Share the 4-letter code.</li>
-                                <li>Host selects the zone (Tee/Fairway).</li>
-                                <li>Host spins the wheel for the group!</li>
-                            </ul>
+                        <div className="section-title">HOW IT WORKS</div>
+                        <div className="howto-grid">
+                            <div className="howto-item"><div className="howto-icon-box"><i data-lucide="users"></i></div><div className="howto-text">Host creates a room</div></div>
+                            <div className="howto-item"><div className="howto-icon-box"><i data-lucide="share"></i></div><div className="howto-text">Share the 4-letter code</div></div>
+                            <div className="howto-item"><div className="howto-icon-box"><i data-lucide="target"></i></div><div className="howto-text">Host picks the zone</div></div>
+                            <div className="howto-item"><div className="howto-icon-box"><i data-lucide="trophy"></i></div><div className="howto-text">Spin & win points</div></div>
                         </div>
 
-                        {/* SOUND */}
+                        <div className="section-title">PREFERENCES</div>
                         <div className="settings-row">
                             <span className="settings-label">Sound Effects</span>
                             <div className={`toggle-switch ${soundOn ? 'on' : ''}`} onClick={toggleSound}>
@@ -216,7 +289,6 @@
                             </div>
                         </div>
 
-                        {/* INSTALL */}
                         {installEvent && (
                             <div style={{padding:'20px 0'}}>
                                 <button className="btn btn-primary" onClick={onInstall}>
@@ -225,18 +297,50 @@
                             </div>
                         )}
 
-                        {/* LOGOUT */}
                         <div style={{marginTop:20, paddingTop:20, borderTop:'1px solid #E5E7EB'}}>
                             <button className="btn btn-danger" onClick={onLogout}>
                                 <i data-lucide="log-out"></i> LOG OUT
                             </button>
                         </div>
-
-                        <button onClick={onClose} style={{marginTop:15, width:'100%', padding:10, border:'none', background:'transparent', color:'#6B7280', fontWeight:600}}>CLOSE</button>
                     </div>
                 </div>
             );
         };
+
+        const Wheel = ({ isSpinning, currentText, zone }) => {
+            return (
+                <div className="wheel-container">
+                    <div className="wheel-pointer"></div>
+                    <div className={`wheel-spinner ${isSpinning ? 'spinning' : ''}`}></div>
+                    <div className="wheel-center">
+                        <div className="zone-badge">{zone} ZONE</div>
+                        <div className="challenge-text" style={{transform: isSpinning ? 'scale(0.9)' : 'scale(1)', transition: 'transform 0.2s'}}>
+                            {currentText}
+                        </div>
+                        {isSpinning && <div style={{fontSize:10, marginTop:8, color:'rgba(255,255,255,0.5)', fontWeight:700, letterSpacing:1}}>SPINNING...</div>}
+                    </div>
+                </div>
+            );
+        };
+
+        const PlayerList = ({ players, onScore }) => (
+            <div className="card" style={{padding:0, overflow:'hidden', border:'none'}}>
+                <div style={{background:'#F3F4F6', padding:'12px 16px', fontSize:11, fontWeight:800, color:'#6B7280', letterSpacing:1}}>LEADERBOARD</div>
+                {players.sort((a,b) => b.score - a.score).map((p, i) => (
+                    <div key={i} style={{display:'flex', alignItems:'center', padding:'16px', borderBottom:'1px solid #F3F4F6', background: i===0 ? '#FEF9C3' : 'white'}}>
+                        <img src={p.photo} style={{width:40, height:40, borderRadius:'50%', marginRight:12, border: i===0 ? '2px solid #FACC15' : '2px solid transparent'}} />
+                        <div style={{flex:1, fontWeight:600, color: '#1F2937'}}>
+                            {p.name}
+                            {i === 0 && <span style={{fontSize:14, marginLeft:6}}>👑</span>}
+                        </div>
+                        <div style={{fontSize:20, fontWeight:800, marginRight:16, color: i===0 ? '#B45309' : '#374151'}}>{p.score}</div>
+                        <button onClick={() => onScore(p.uid)} style={{width:36, height:36, borderRadius:10, border:'none', background:'#D1FAE5', color:'#065F46', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', boxShadow:'0 2px 0 #6EE7B7'}}>
+                            <i data-lucide="plus" size="18"></i>
+                        </button>
+                    </div>
+                ))}
+            </div>
+        );
 
         function App() {
             const [user, setUser] = useState(null);
@@ -247,13 +351,9 @@
             const [localSpinText, setLocalSpinText] = useState("WAITING...");
             const [isSpinning, setIsSpinning] = useState(false);
             const [modal, setModal] = useState({ open: false, title: "", message: "", type: "neutral" });
-            
-            // Settings State
             const [showSettings, setShowSettings] = useState(false);
             const [soundOn, setSoundOn] = useState(true);
             const [installPrompt, setInstallPrompt] = useState(null);
-
-            // Audio Ref
             const audioRef = useRef(new Audio("https://cdn.freesound.org/previews/256/256113_3263906-lq.mp3"));
 
             useEffect(() => {
@@ -261,43 +361,14 @@
                     setUser(u);
                     setLoading(false);
                 });
-                
-                // Capture Install Prompt
                 window.addEventListener('beforeinstallprompt', (e) => {
                     e.preventDefault();
                     setInstallPrompt(e);
                 });
-
                 return () => unsub();
             }, []);
 
-            // LISTEN TO GAME
-            useEffect(() => {
-                if (!gameCode) return;
-                const unsub = window.ops.onSnapshot(window.ops.doc(window.db, "games", gameCode), (doc) => {
-                    if (doc.exists()) {
-                        const data = doc.data();
-                        setGameData(data);
-                        if (data.isSpinning) {
-                            setIsSpinning(true);
-                            const interval = setInterval(() => {
-                                const list = CHALLENGES[data.zone || 'TEE'];
-                                setLocalSpinText(list[Math.floor(Math.random() * list.length)]);
-                                playTick();
-                            }, 80);
-                            return () => clearInterval(interval);
-                        } else {
-                            setIsSpinning(false);
-                            if(data.currentChallenge) setLocalSpinText(data.currentChallenge);
-                        }
-                    }
-                });
-                return () => unsub();
-            }, [gameCode, soundOn]); // Re-bind if sound setting changes
-
-            useEffect(() => { lucide.createIcons(); }, [user, gameData, loading, showSettings]);
-
-            // HELPER FUNCTIONS
+            // SOUND ENGINE
             const playTick = () => {
                 if(soundOn && audioRef.current) {
                     audioRef.current.volume = 0.2;
@@ -306,6 +377,43 @@
                 }
             };
 
+            // GAME LOOP
+            useEffect(() => {
+                if (!gameCode) return;
+                let interval;
+                
+                const unsub = window.ops.onSnapshot(window.ops.doc(window.db, "games", gameCode), (doc) => {
+                    if (doc.exists()) {
+                        const data = doc.data();
+                        setGameData(data);
+                        
+                        if (data.isSpinning) {
+                            setIsSpinning(true);
+                            // Start Loop
+                            if(!interval) {
+                                interval = setInterval(() => {
+                                    const list = CHALLENGES[data.zone || 'TEE'];
+                                    setLocalSpinText(list[Math.floor(Math.random() * list.length)]);
+                                    playTick();
+                                }, 80);
+                            }
+                        } else {
+                            setIsSpinning(false);
+                            if(interval) clearInterval(interval); // STOP SOUND
+                            if(data.currentChallenge) setLocalSpinText(data.currentChallenge);
+                        }
+                    }
+                });
+                
+                return () => {
+                    unsub();
+                    if(interval) clearInterval(interval);
+                };
+            }, [gameCode, soundOn]); // Add soundOn to deps
+
+            useEffect(() => { lucide.createIcons(); }, [user, gameData, loading, showSettings]);
+
+            // ACTIONS
             const handleInstall = () => {
                 if(!installPrompt) return;
                 installPrompt.prompt();
@@ -313,16 +421,8 @@
                     if(choice.outcome === 'accepted') setInstallPrompt(null);
                 });
             };
-
-            const handleLogout = async () => {
-                setShowSettings(false);
-                await window.ops.signOut(window.auth);
-                setGameCode("");
-                setGameData(null);
-            };
-
+            const handleLogout = async () => { setShowSettings(false); await window.ops.signOut(window.auth); setGameCode(""); setGameData(null); };
             const handleLogin = async () => { await window.ops.signInWithPopup(window.auth, window.provider); };
-
             const createGame = async () => {
                 const code = Math.random().toString(36).substring(2, 6).toUpperCase();
                 await window.ops.setDoc(window.ops.doc(window.db, "games", code), {
@@ -335,28 +435,21 @@
                 });
                 setGameCode(code);
             };
-
             const joinGame = async (codeInput) => {
                 const code = codeInput.toUpperCase();
-                if(code.length !== 4) {
-                     setModal({ open: true, title: "Invalid Code", message: "Enter the 4-letter code.", type: "error" });
-                     return;
-                }
+                if(code.length !== 4) { setModal({ open: true, title: "Invalid Code", message: "Enter the 4-letter code.", type: "error" }); return; }
                 const ref = window.ops.doc(window.db, "games", code);
                 const snap = await window.ops.getDoc(ref);
                 if (snap.exists()) {
                     const players = snap.data().players || [];
                     if (!players.find(p => p.uid === user.uid)) {
-                        await window.ops.updateDoc(ref, {
-                            players: window.ops.arrayUnion({ uid: user.uid, name: user.displayName.split(" ")[0], photo: user.photoURL, score: 0 })
-                        });
+                        await window.ops.updateDoc(ref, { players: window.ops.arrayUnion({ uid: user.uid, name: user.displayName.split(" ")[0], photo: user.photoURL, score: 0 }) });
                     }
                     setGameCode(code);
                 } else {
                     setModal({ open: true, title: "Game Not Found", message: "That room doesn't exist.", type: "error" });
                 }
             };
-
             const handleSpin = async () => {
                 if(isSpinning) return;
                 const ref = window.ops.doc(window.db, "games", gameCode);
@@ -366,51 +459,46 @@
                         const list = CHALLENGES[zone];
                         const result = list[Math.floor(Math.random() * list.length)];
                         await window.ops.updateDoc(ref, { isSpinning: false, currentChallenge: result });
-                    }, 2000);
+                    }, 2500); // Increased spin time slightly
                 } catch (error) {
                     await window.ops.updateDoc(ref, { isSpinning: false, currentChallenge: "ERROR - SPIN AGAIN" });
                 }
             };
-
             const addPoint = async (uid) => {
                 const ref = window.ops.doc(window.db, "games", gameCode);
                 const snap = await window.ops.getDoc(ref);
-                const newPlayers = snap.data().players.map(p => {
-                    if (p.uid === uid) return { ...p, score: p.score + 1 };
-                    return p;
-                });
+                const newPlayers = snap.data().players.map(p => { if (p.uid === uid) return { ...p, score: p.score + 1 }; return p; });
                 await window.ops.updateDoc(ref, { players: newPlayers });
             };
 
             // RENDER
-            if (loading) return <div className="app-container flex-center" style={{color:'white'}}>Loading...</div>;
+            if (loading) return <div className="app-container" style={{justifyContent:'center', alignItems:'center', color:'white'}}>Loading...</div>;
 
             if (!user) return (
-                <div className="app-container" style={{justifyContent:'center', padding:20, textAlign:'center'}}>
-                    <img src="./images/logo512.png" className="logo-main" alt="Logo" />
-                    <h1 style={{fontFamily:'var(--font-display)', fontSize:42, lineHeight:1, marginBottom:10, color:'white', textShadow:'0 4px 10px rgba(0,0,0,0.3)'}}>CADDIE<br/><span style={{color:'var(--accent)'}}>ROULETTE</span></h1>
-                    <button className="btn btn-primary" onClick={handleLogin} style={{background:'white', color:'#064E3B'}}>
-                        <i data-lucide="log-in"></i> Sign in with Google
-                    </button>
+                <div className="app-container" style={{justifyContent:'center'}}>
+                     <div className="card" style={{textAlign:'center', margin:'20px'}}>
+                        <img src="./images/logo512.png" className="logo-login" alt="Logo" style={{width:120, height:120, animation:'float 3s ease-in-out infinite'}} />
+                        <h1 style={{fontFamily:'var(--font-display)', fontSize:32, lineHeight:1, marginBottom:10, color:'var(--primary)'}}>CADDIE ROULETTE</h1>
+                        <p style={{marginBottom:30, color:'#6B7280'}}>The ultimate golf party game.</p>
+                        <button className="btn btn-primary" onClick={handleLogin}>
+                            <i data-lucide="log-in"></i> Sign in with Google
+                        </button>
+                    </div>
                 </div>
             );
 
-            // COMMON HEADER FOR LOBBY & GAME
             const Header = () => (
                 <div className="header">
-                    <div style={{display:'flex', alignItems:'center'}}>
-                        <img src="./images/logo512.png" className="header-logo" />
-                        <div className="header-title">ROULETTE</div>
-                    </div>
-                    <div style={{display:'flex', alignItems:'center'}}>
+                    <img src="./images/logo512.png" className="header-logo" />
+                    <div style={{position:'absolute', right:20, top:20}}>
                         {gameCode && (
-                            <div style={{marginRight:10, textAlign:'right'}}>
-                                <div style={{fontSize:9, opacity:0.8, fontWeight:700}}>CODE</div>
-                                <div style={{fontFamily:'var(--font-display)', fontSize:18, letterSpacing:1}}>{gameCode}</div>
+                            <div style={{position:'absolute', right:60, top:5, textAlign:'right', color:'#1F2937'}}>
+                                <div style={{fontSize:9, fontWeight:800, opacity:0.5}}>ROOM</div>
+                                <div style={{fontFamily:'var(--font-display)', fontSize:24, letterSpacing:1}}>{gameCode}</div>
                             </div>
                         )}
                         <button className="header-btn" onClick={() => setShowSettings(true)}>
-                            <i data-lucide="settings" size="20"></i>
+                            <i data-lucide="settings" size="24"></i>
                         </button>
                     </div>
                 </div>
@@ -419,23 +507,13 @@
             return (
                 <div className="app-container">
                     <Modal isOpen={modal.open} title={modal.title} message={modal.message} type={modal.type} onClose={() => setModal({...modal, open: false})} />
-                    
-                    <SettingsModal 
-                        isOpen={showSettings} 
-                        onClose={() => setShowSettings(false)}
-                        soundOn={soundOn}
-                        toggleSound={() => setSoundOn(!soundOn)}
-                        installEvent={installPrompt}
-                        onInstall={handleInstall}
-                        onLogout={handleLogout}
-                    />
+                    <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} soundOn={soundOn} toggleSound={() => setSoundOn(!soundOn)} installEvent={installPrompt} onInstall={handleInstall} onLogout={handleLogout} />
 
                     <Header />
 
                     {!gameCode ? (
-                        /* LOBBY VIEW */
-                        <div className="game-content" style={{justifyContent:'flex-start'}}>
-                             <div className="card" style={{textAlign:'center', marginTop:20}}>
+                        <div className="game-content">
+                             <div className="card" style={{textAlign:'center'}}>
                                 <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:10, marginBottom:20}}>
                                     <img src={user.photoURL} style={{width:40, height:40, borderRadius:'50%'}}/>
                                     <h3 style={{fontSize:18}}>Hi, {user.displayName.split(" ")[0]}</h3>
@@ -455,21 +533,11 @@
                             </div>
                         </div>
                     ) : (
-                        /* GAME VIEW */
                         <div className="game-content">
-                            <div style={{marginBottom:24}}>
-                                <div className="roulette-box">
-                                    <div className="roulette-bg"></div>
-                                    <div className="zone-badge">{gameData?.zone || 'TEE'} ZONE</div>
-                                    <div className="challenge-text" style={{transform: isSpinning ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.1s'}}>
-                                        {isSpinning ? localSpinText : (gameData?.currentChallenge || "READY")}
-                                    </div>
-                                    {isSpinning && <div style={{fontSize:12, marginTop:15, color:'white', opacity:0.8, fontWeight:700, letterSpacing:1}}>SPINNING...</div>}
-                                </div>
-                            </div>
+                            <Wheel isSpinning={isSpinning} currentText={localSpinText} zone={gameData?.zone || 'TEE'} />
 
-                            {(gameData && gameData.host === user.uid) && (
-                                <div style={{marginBottom:24}}>
+                            {(gameData && gameData.host === user.uid) ? (
+                                <div className="card">
                                     <div className="zone-selector">
                                         {['TEE', 'FAIRWAY', 'GREEN'].map(z => (
                                             <button key={z} className={`zone-btn ${zone === z ? 'active' : ''}`} onClick={() => setZone(z)}>{z}</button>
@@ -479,36 +547,20 @@
                                         {isSpinning ? 'SPINNING...' : 'SPIN THE WHEEL'}
                                     </button>
                                 </div>
-                            )}
-
-                            {!isSpinning && gameData && gameData.host !== user.uid && isSpinning && (
-                                <div className="card" style={{textAlign:'center', background:'rgba(250, 204, 21, 0.9)', color:'#713F12', fontWeight:800, marginBottom:20, border:'none'}}>
-                                    HOST IS SPINNING...
-                                </div>
-                            )}
-
-                            <div className="card" style={{padding:0, overflow:'hidden', border:'none'}}>
-                                <div style={{background:'rgba(0,0,0,0.05)', padding:'12px 16px', fontSize:11, fontWeight:800, color:'#6B7280', letterSpacing:1}}>LEADERBOARD</div>
-                                {(gameData?.players || []).sort((a,b) => b.score - a.score).map((p, i) => (
-                                    <div key={i} style={{display:'flex', alignItems:'center', padding:'16px', borderBottom:'1px solid #F3F4F6', background: i===0 ? 'rgba(250, 204, 21, 0.1)' : 'transparent'}}>
-                                        <img src={p.photo} style={{width:40, height:40, borderRadius:'50%', marginRight:12, border: i===0 ? '2px solid #FACC15' : '2px solid transparent'}} />
-                                        <div style={{flex:1, fontWeight:600, color: '#1F2937'}}>
-                                            {p.name}
-                                            {i === 0 && <span style={{fontSize:14, marginLeft:6}}>👑</span>}
-                                        </div>
-                                        <div style={{fontSize:20, fontWeight:800, marginRight:16, color: i===0 ? '#B45309' : '#374151'}}>{p.score}</div>
-                                        <button onClick={() => addPoint(p.uid)} style={{width:36, height:36, borderRadius:10, border:'none', background:'#D1FAE5', color:'#065F46', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', boxShadow:'0 2px 0 #6EE7B7'}}>
-                                            <i data-lucide="plus" size="18"></i>
-                                        </button>
+                            ) : (
+                                isSpinning && (
+                                    <div className="card" style={{textAlign:'center', background:'#FEF3C7', color:'#B45309', fontWeight:800}}>
+                                        HOST IS SPINNING...
                                     </div>
-                                ))}
-                            </div>
+                                )
+                            )}
+
+                            <PlayerList players={gameData?.players || []} onScore={addPoint} />
                         </div>
                     )}
                 </div>
             );
         }
-
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
