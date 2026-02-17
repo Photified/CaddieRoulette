@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <title>Caddie Roulette</title>
     
     <link rel="manifest" href="./manifest.json" />
@@ -31,7 +31,8 @@
             background-image: radial-gradient(circle at center, #065f46 0%, #022c22 100%);
             color: var(--text-main); 
             font-family: var(--font-sans); 
-            height: 100vh; 
+            /* FIX 1: Use dvh (dynamic viewport height) to respect mobile browser bars */
+            height: 100dvh; 
             overflow: hidden; 
             display: flex;
             align-items: center;
@@ -43,11 +44,14 @@
             width: 100%;
             max-width: 450px; 
             height: 100%;
-            max-height: 850px; 
+            /* FIX 1: Match body height */
+            height: 100dvh; 
             display: flex; 
             flex-direction: column; 
             position: relative;
             background: transparent;
+            /* FIX 2: Add padding for bottom safe area (home bar) */
+            padding-bottom: env(safe-area-inset-bottom);
         }
         @media (min-width: 500px) {
             .app-container {
@@ -56,13 +60,15 @@
                 height: 90vh;
                 overflow: hidden;
                 background: rgba(0,0,0,0.2); 
+                padding-bottom: 0; /* Reset for desktop */
             }
         }
 
         /* HEADER */
         .header { 
             background: #FFFFFF; 
-            height: 90px;
+            /* Increase height slightly to accommodate notch padding */
+            min-height: 90px;
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -73,6 +79,8 @@
             border-bottom-right-radius: 24px;
             flex-shrink: 0;
             padding: 0 20px;
+            /* FIX 3: Add padding for top safe area (notch) */
+            padding-top: env(safe-area-inset-top);
         }
         
         .header-logo { 
@@ -81,13 +89,21 @@
         }
         
         .header-left {
-            position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+            position: absolute; left: 20px; 
+            /* Adjust top position to account for padding */
+            top: calc(50% + env(safe-area-inset-top) / 2); 
+            transform: translateY(-50%);
             display: flex; flex-direction: column; align-items: flex-start;
         }
         .room-label { font-size: 9px; font-weight: 800; color: #9CA3AF; letter-spacing: 1px; text-transform: uppercase; }
         .room-code { font-family: var(--font-display); font-size: 28px; color: #1F2937; line-height: 1; letter-spacing: 1px; }
 
-        .header-right { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
+        .header-right { 
+            position: absolute; right: 20px; 
+            /* Adjust top position to account for padding */
+            top: calc(50% + env(safe-area-inset-top) / 2); 
+            transform: translateY(-50%); 
+        }
         .header-btn { 
             background: #F3F4F6; border: none; color: var(--primary); 
             padding: 10px; border-radius: 12px; width: 44px; height: 44px;
@@ -99,13 +115,17 @@
         /* CONTENT */
         .game-content { 
             flex: 1; 
+            /* Standard scrolling behavior */
             overflow-y: auto; 
+            -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
             padding: 20px; 
             display: flex; 
             flex-direction: column; 
             align-items: stretch;
             scrollbar-width: none; 
             position: relative;
+            /* Ensure content doesn't get cut off at very bottom */
+            min-height: 0; 
         }
         .game-content::-webkit-scrollbar { display: none; }
         
@@ -120,6 +140,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            flex-shrink: 0; /* Prevent cards from squishing */
         }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
@@ -141,6 +162,7 @@
         /* WHEEL STYLES */
         .wheel-container-wrapper {
             position: relative; display: flex; justify-content: center; margin-bottom: 20px; min-height: 300px;
+            flex-shrink: 0; /* Keep wheel full size */
         }
         .wheel-stage {
             position: relative; width: 300px; height: 300px; border-radius: 50%;
@@ -458,7 +480,7 @@
         };
 
         const PlayerList = ({ players, onScore }) => (
-            <div className="card" style={{padding:0, overflow:'hidden', border:'none', marginTop:'auto'}}>
+            <div className="card" style={{padding:0, overflow:'hidden', border:'none', marginTop:'auto', flexShrink: 0}}>
                 <div style={{background:'#F3F4F6', padding:'12px 16px', fontSize:11, fontWeight:800, color:'#6B7280', letterSpacing:1}}>LEADERBOARD</div>
                 {players.sort((a,b) => b.score - a.score).map((p, i) => (
                     <div key={i} style={{display:'flex', alignItems:'center', padding:'16px', borderBottom:'1px solid #F3F4F6', background: i===0 ? '#FEF9C3' : 'white'}}>
