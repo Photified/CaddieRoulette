@@ -2,590 +2,526 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Caddie Roulette</title>
-    
-    <link rel="manifest" href="./manifest.json" />
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#FFFFFF">
-
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-
     <style>
         :root {
-            --primary: #064E3B; 
-            --primary-light: #059669; 
-            --accent: #FACC15; 
-            --text-main: #1F2937;
-            --font-display: "Impact", "Arial Black", sans-serif;
-            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --primary-yellow: #FFC107;
+            --dark-bg: #1a1a1a;
+            --red-segment: #D32F2F;
+            --dark-segment: #263238;
+            --active-green: #1B5E20;
+            --text-color: #333;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            background: #FFFFFF; 
-            color: var(--text-main); 
-            font-family: var(--font-sans); 
-            height: 100dvh; 
-            overflow: hidden; 
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-        }
-        
-        /* APP CONTAINER */
-        .app-container { 
-            width: 100%;
-            height: 100dvh; 
-            display: flex; 
-            flex-direction: column; 
-            background: #FFFFFF; 
-            position: relative;
-            box-shadow: none !important;
-            border: none !important;
-        }
-
-        @media (min-width: 500px) {
-            .app-container { max-width: 450px; margin: 0 auto; }
-        }
-
-        /* HEADER */
-        .header { 
-            height: 70px; /* Increased height for label */
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            flex-shrink: 0;
-            position: relative;
-            z-index: 20;
-            width: 100%;
-            background: #FFFFFF;
-        }
-        .header-logo { height: 40px; width: 40px; }
-        .header-right { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
-        .header-btn { background: transparent; border: none; cursor: pointer; color: #9CA3AF; padding: 8px; }
-
-        /* NEW ROOM CODE STYLES */
-        .room-info-container {
-            position: absolute; 
-            left: 20px; 
-            top: 50%; 
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-        }
-        .room-label {
-            font-size: 10px;
-            font-weight: 800;
-            color: #9CA3AF;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
-        }
-        .room-code { 
-            font-family: var(--font-display); 
-            font-size: 20px; 
-            color: #6B7280; 
-            letter-spacing: 1px; 
-            line-height: 1;
-        }
-
-        /* LAYOUT */
-        .game-content { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            width: 100%; 
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .top-section {
-            height: 55%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            width: 100%;
-            position: relative;
-            overflow: visible; 
-        }
-
-        .bottom-section {
-            height: 45%; 
-            width: 100%;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center; 
-            padding: 0 30px; 
-            background: #FFFFFF;
+            min-height: 100vh;
         }
 
-        /* WHEEL COMPONENT */
-        .wheel-stage {
-            position: relative; width: 280px; height: 280px; border-radius: 50%;
-            background: #111827; 
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
-            border: 4px solid #111827; 
+        /* --- HEADER --- */
+        header {
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            max-width: 800px;
         }
-        
-        .wheel-rim { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 12px solid #281D11; pointer-events: none; z-index: 20; }
-        
-        .wheel-spinner {
-            width: 94%; height: 94%; border-radius: 50%; position: relative;
+
+        .room-code {
+            font-weight: bold;
+            color: #555;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .room-code span {
+            display: block;
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .logo {
+            width: 50px; 
+            height: 50px;
+            background-color: #1B5E20; /* Placeholder for logo */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .settings-icon {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+            transition: transform 0.2s;
+        }
+        .settings-icon:hover {
+            transform: rotate(90deg);
+            color: #333;
+        }
+
+        /* --- MAIN WHEEL AREA --- */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin-bottom: 40px;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 8px solid #333;
+            position: relative;
+            overflow: hidden;
+            transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
+            /* Creating the segments using conic-gradient */
             background: conic-gradient(
-                #DC2626 0deg 30deg, #1F2937 30deg 60deg, #DC2626 60deg 90deg, #1F2937 90deg 120deg, 
-                #DC2626 120deg 150deg, #1F2937 150deg 180deg, #DC2626 180deg 210deg, #1F2937 210deg 240deg, 
-                #DC2626 240deg 270deg, #1F2937 270deg 300deg, #DC2626 300deg 330deg, #1F2937 330deg 360deg
+                var(--red-segment) 0deg 30deg,
+                var(--dark-segment) 30deg 60deg,
+                var(--red-segment) 60deg 90deg,
+                var(--dark-segment) 90deg 120deg,
+                var(--red-segment) 120deg 150deg,
+                var(--dark-segment) 150deg 180deg,
+                var(--red-segment) 180deg 210deg,
+                var(--dark-segment) 210deg 240deg,
+                var(--red-segment) 240deg 270deg,
+                var(--dark-segment) 270deg 300deg,
+                var(--red-segment) 300deg 330deg,
+                var(--dark-segment) 330deg 360deg
             );
-            transition: transform 3s cubic-bezier(0.2, 0.8, 0.1, 1); 
-            transform: rotate(0deg);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-        /* Wheel spins Clockwise */
-        .wheel-spinner.spinning { animation: spinCW 0.6s linear infinite; }
-        @keyframes spinCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* NUMBERS */
+        /* Numbers on the wheel (Simplified for CSS) */
         .wheel-number {
-            position: absolute; top: 50%; left: 50%;
-            font-family: var(--font-display); color: white; font-size: 16px; 
-            width: 20px; height: 20px; line-height: 20px; text-align: center;
-            margin-top: -10px; margin-left: -10px; 
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            pointer-events: none;
+        }
+        /* Rotations for numbers */
+        .n1 { transform: translate(-50%, -50%) rotate(15deg) translateY(-110px); }
+        .n2 { transform: translate(-50%, -50%) rotate(45deg) translateY(-110px); }
+        .n3 { transform: translate(-50%, -50%) rotate(75deg) translateY(-110px); }
+        .n4 { transform: translate(-50%, -50%) rotate(105deg) translateY(-110px); }
+        .n5 { transform: translate(-50%, -50%) rotate(135deg) translateY(-110px); }
+        .n6 { transform: translate(-50%, -50%) rotate(165deg) translateY(-110px); }
+        .n7 { transform: translate(-50%, -50%) rotate(195deg) translateY(-110px); }
+        .n8 { transform: translate(-50%, -50%) rotate(225deg) translateY(-110px); }
+        .n9 { transform: translate(-50%, -50%) rotate(255deg) translateY(-110px); }
+        .n10 { transform: translate(-50%, -50%) rotate(285deg) translateY(-110px); }
+        .n11 { transform: translate(-50%, -50%) rotate(315deg) translateY(-110px); }
+        .n12 { transform: translate(-50%, -50%) rotate(345deg) translateY(-110px); }
+
+        .wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background-color: #263238;
+            border-radius: 50%;
+            border: 4px solid #FFC107;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
             z-index: 10;
         }
 
-        /* BALL PHYSICS */
-        .ball-container { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            pointer-events: none; 
-            z-index: 50; 
-            transition: transform 3s cubic-bezier(0.2, 0.8, 0.1, 1);
-        }
-        
-        /* Ball spins Counter-Clockwise */
-        .ball-container.spinning { animation: spinCCW 1.2s linear infinite; }
-        @keyframes spinCCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
-
-        .ball-container.spinning .ball { animation: bounce 0.3s ease-in-out infinite alternate; }
-        @keyframes bounce { from { top: 22px; } to { top: 18px; } }
-
-        .ball { 
-            position: absolute; top: 20px; left: 50%; margin-left: -6px; 
-            width: 12px; height: 12px; 
-            background: white; border-radius: 50%; 
-            box-shadow: 0 0 4px rgba(0,0,0,0.5); 
+        .center-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #FFC107;
         }
 
-        .wheel-center {
-            position: absolute; width: 100px; height: 100px; background: #111827; border: 4px solid #FACC15;
-            border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 30;
+        .center-value {
+            font-size: 24px;
+            font-weight: bold;
         }
-        .result-number-center { font-size: 38px; font-weight: 900; color: white; line-height: 1; }
-        .result-label-center { font-size: 10px; color: #FACC15; font-weight: 700; letter-spacing: 1px; margin-top: 4px; }
 
-        /* UI ELEMENTS */
-        .btn { 
-            border: none; padding: 22px 0; border-radius: 16px; 
-            font-weight: 800; font-size: 18px; width: 100%; cursor: pointer; 
-            display: flex; align-items: center; justify-content: center; 
-            text-transform: uppercase; letter-spacing: 2px;
+        .pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0; 
+            height: 0; 
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 15px solid #333;
+            z-index: 20;
+        }
+
+        /* --- CONTROLS --- */
+        .controls {
+            display: flex;
+            background: #f0f0f0;
+            border-radius: 8px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+
+        .control-btn {
+            border: none;
+            background: transparent;
+            /* UPDATED: Increased padding here */
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #777;
+            border-radius: 5px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .control-btn.active {
+            background-color: var(--active-green);
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .spin-btn {
+            background-color: var(--primary-yellow);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: 900;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: transform 0.1s;
+            color: #333;
         }
-        .btn:active { transform: scale(0.98); }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-accent { background: var(--accent); color: #422006; }
+
+        .spin-btn:active {
+            transform: scale(0.98);
+        }
         
-        /* UPDATED ZONE SELECTOR: Wider with Gaps */
-        .zone-selector { 
-            display: flex; 
-            gap: 12px; /* Adds padding between buttons */
-            margin-bottom: 30px; 
-            background: transparent; 
+        .spin-btn:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+            color: #999;
+        }
+
+        .result-display {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            height: 30px;
+            color: #333;
+        }
+
+        /* --- MODAL STYLES --- */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 100; 
+            left: 0;
+            top: 0;
             width: 100%; 
-        }
-        .zone-btn { 
-            flex: 1; 
-            padding: 16px 0; 
-            border-radius: 12px; 
-            border: none; 
-            background: #F3F4F6; /* Default background for inactive */
-            color: #9CA3AF; 
-            font-weight: 800; 
-            font-size: 11px; 
-            cursor: pointer; 
-            letter-spacing: 1px; 
-            transition: 0.2s;
-        }
-        .zone-btn.active { 
-            background: var(--primary); /* Active background */
-            color: white; 
-            box-shadow: 0 4px 12px rgba(6, 78, 59, 0.3); 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.5); 
+            backdrop-filter: blur(2px);
         }
 
-        .result-container { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: popIn 0.2s; }
-        @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        
-        .result-text { 
-            font-family: var(--font-display); font-size: 42px; color: #1F2937; 
-            text-transform: uppercase; text-align: center; line-height: 1; margin-bottom: 40px;
-            width: 100%;
-        }
-        .result-badge-big {
-            width: 60px; height: 60px; background: #DC2626; color: white; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 24px;
-            border: 4px solid #1F2937; margin-bottom: 20px;
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto; 
+            padding: 0;
+            border: 1px solid #888;
+            width: 90%; 
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
 
-        .input-lg { font-size: 24px; padding: 20px; text-align: center; border: 2px solid #E5E7EB; border-radius: 16px; width: 100%; outline: none; font-weight: 800; letter-spacing: 4px; text-transform: uppercase; background: #F9FAFB; margin-bottom: 20px; }
-        .input-lg:focus { border-color: var(--primary); background: white; }
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-        .modal-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
-        .modal-content { background: white; width: 100%; max-width: 400px; text-align: center; display: flex; flex-direction: column; }
-        
-        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #F3F4F6; text-align: left; width: 100%; }
-        .toggle-switch { width: 50px; height: 30px; background: #E5E7EB; border-radius: 30px; position: relative; cursor: pointer; transition: 0.2s; }
-        .toggle-switch.on { background: var(--primary); }
-        .toggle-circle { width: 26px; height: 26px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .toggle-switch.on .toggle-circle { left: 22px; }
+        .modal-header h2 { margin: 0; font-size: 1.5rem; }
 
-        .challenge-item { display: flex; align-items: center; padding: 14px 0; border-bottom: 1px solid #F3F4F6; text-align: left; font-size: 14px; color: #374151; font-weight: 600; }
-        .challenge-num { width: 28px; height: 28px; background: #111827; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; margin-right: 14px; flex-shrink: 0; }
-        .challenge-num.red { background: #DC2626; }
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        /* Settings Content Styles */
+        .settings-section h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        .challenge-category h4 {
+            margin-bottom: 5px;
+            margin-top: 15px;
+            color: var(--active-green);
+        }
+
+        .challenge-category ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin-bottom: 15px;
+            color: #555;
+        }
     </style>
 </head>
 <body>
-    <div id="root"></div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, doc, updateDoc, onSnapshot, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        
-        const firebaseConfig = {
-          apiKey: "AIzaSyCw3_nIjjDYUo-lVpV7qtj6Kdn9dbPM0dE",
-          authDomain: "caddieroulette-9f6b4.firebaseapp.com",
-          projectId: "caddieroulette-9f6b4",
-          storageBucket: "caddieroulette-9f6b4.firebasestorage.app",
-          messagingSenderId: "108668982333",
-          appId: "1:108668982333:web:0f5eabea5caec6ab844654"
-        };
+    <header>
+        <div class="logo">LOGO</div>
+        <div class="room-code">
+            <span>ROOM CODE</span>
+            GN79
+        </div>
+        <div class="settings-icon" onclick="openModal()">⚙️</div>
+    </header>
 
-        const app = initializeApp(firebaseConfig);
-        window.db = getFirestore(app);
-        window.auth = getAuth(app);
-        window.ops = { collection, addDoc, doc, updateDoc, onSnapshot, getDoc, setDoc, signInAnonymously, signOut, onAuthStateChanged };
-    </script>
+    <main>
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <div class="wheel" id="wheel">
+                <div class="wheel-number n1">1</div>
+                <div class="wheel-number n2">2</div>
+                <div class="wheel-number n3">3</div>
+                <div class="wheel-number n4">4</div>
+                <div class="wheel-number n5">5</div>
+                <div class="wheel-number n6">6</div>
+                <div class="wheel-number n7">7</div>
+                <div class="wheel-number n8">8</div>
+                <div class="wheel-number n9">9</div>
+                <div class="wheel-number n10">10</div>
+                <div class="wheel-number n11">11</div>
+                <div class="wheel-number n12">12</div>
+            </div>
+            
+            <div class="wheel-center">
+                <span class="center-label" id="centerLabel">TEE</span>
+                <span class="center-value" id="centerValue">?</span>
+            </div>
+        </div>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        <div class="controls">
+            <button class="control-btn" onclick="setShotType('tee')" id="btn-tee">TEE</button>
+            <button class="control-btn active" onclick="setShotType('approach')" id="btn-approach">APPROACH</button>
+            <button class="control-btn" onclick="setShotType('green')" id="btn-green">GREEN</button>
+        </div>
 
-        const CHALLENGES = {
-            TEE: [
-                "Driver off the Deck", "7-Iron Only", "Eyes Closed Swing", 
-                "Happy Gilmore", "Wrong Handed", "Yell 'MASHED POTATOES'",
-                "Tee it High (Driver)", "No Practice Swing", "Must Hit Fade",
-                "Must Hit Draw", "Silence (No Talking)", "Commentate Your Shot"
+        <button class="spin-btn" id="spinBtn" onclick="spinWheel()">SPIN THE WHEEL</button>
+
+        <div class="result-display" id="resultDisplay"></div>
+    </main>
+
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                
+                <div class="settings-section">
+                    <h3>How To Play</h3>
+                    <p>
+                        Select your shot type (Tee, Approach, or Green) depending on where you are 
+                        on the course. Click "Spin the Wheel" to receive a random challenge or 
+                        instruction for your next stroke. Good luck!
+                    </p>
+                </div>
+            
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+            
+                <div class="settings-section">
+                    <h3>Active Challenges</h3>
+                    
+                    <div class="challenge-category">
+                        <h4>🏌️ Tee Shots</h4>
+                        <ul>
+                            <li>Driver off the deck</li>
+                            <li>7 Iron only</li>
+                            <li>Wrong handed swing</li>
+                            <li>Eyes closed</li>
+                            <li>Happy Gilmore style</li>
+                        </ul>
+                    </div>
+            
+                    <div class="challenge-category">
+                        <h4>🎯 Approach</h4>
+                        <ul>
+                            <li>Bump and run</li>
+                            <li>Flop shot (even if unnecessary)</li>
+                            <li>Club up and partial swing</li>
+                            <li>Must hit a draw/fade</li>
+                            <li>Use the putter</li>
+                        </ul>
+                    </div>
+            
+                    <div class="challenge-category">
+                        <h4>⛳ Green (Putting)</h4>
+                        <ul>
+                            <li>Putt with wedge</li>
+                            <li>One handed</li>
+                            <li>Eyes closed</li>
+                            <li>Billiard style (pool cue motion)</li>
+                            <li>Opponent chooses line</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Configuration
+        const challenges = {
+            tee: [
+                "Driver off the deck", "7 Iron only", "Wrong handed swing", 
+                "Eyes closed", "Happy Gilmore style", "Use Opponent's Driver", 
+                "No Practice Swing", "Stand on one leg", "Silence only", "Commentate your shot"
             ],
-            APPROACH: [
-                "Club Up 2 (Half Swing)", "Putter from Fairway", "Baseball Grip",
-                "One Handed Finish", "Low Stinger", "Stand on One Leg",
-                "Opponent Picks Club", "Aim Way Left (Slice Back)", "Aim Way Right (Hook Back)",
-                "Eyes Closed Impact", "3-Second Swing", "Yell 'FORE' at Impact"
+            approach: [
+                "Bump and run", "Flop shot", "Club up (partial swing)", 
+                "Must hit a draw", "Must hit a fade", "Use the putter", 
+                "Eyes closed", "Wrong handed", "Chip with Hybrid", "No Practice Swing"
             ],
-            GREEN: [
-                "Putt with Wedge", "Pool Cue Style", "Eyes Closed Putt",
-                "Opponent Places Ball", "Pin In", "Chip on Green",
-                "Lag Putt Only", "One Handed Putt", "No Read Allowed",
-                "Knee Putt", "Reverse Grip", "Eyes Open (Normal)"
+            green: [
+                "Putt with wedge", "One handed", "Eyes closed", 
+                "Billiard style", "Opponent chooses line", "Putt between legs", 
+                "Eyes on hole only", "Flamingo stance", "Use Driver", "No reading the green"
             ]
         };
 
-        const Modal = ({ isOpen, title, message, onClose }) => {
-            if (!isOpen) return null;
-            return (
-                <div className="modal-overlay" onClick={onClose}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <h3 style={{fontSize: 24, fontWeight: 900, marginBottom: 10, color: '#1F2937', textTransform:'uppercase'}}>{title}</h3>
-                        <p style={{color: '#4B5563', marginBottom: 30, fontSize:16, lineHeight:1.5}}>{message}</p>
-                        <button className="btn btn-primary" onClick={onClose}>GOT IT</button>
-                    </div>
-                </div>
-            );
-        };
+        let currentType = 'approach';
+        let currentRotation = 0;
 
-        const SettingsModal = ({ isOpen, onClose, soundOn, toggleSound, onLogout }) => {
-            if (!isOpen) return null;
-            return (
-                <div className="modal-overlay" onClick={onClose}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:30}}>
-                            <h2 style={{fontFamily:'var(--font-display)', fontSize:32, color:'#1F2937'}}>SETTINGS</h2>
-                            <button onClick={onClose} style={{border:'none', background:'transparent'}}><i data-lucide="x" color="#9CA3AF" size="28"></i></button>
-                        </div>
-                        <div className="settings-row">
-                             <span style={{fontWeight:700, fontSize:18, color:'#374151'}}>Sound Effects</span>
-                             <div className={`toggle-switch ${soundOn ? 'on' : ''}`} onClick={toggleSound}>
-                                 <div className="toggle-circle"></div>
-                             </div>
-                        </div>
-                        <div style={{marginTop:40}}>
-                            <button className="btn btn-primary" style={{background:'#FEE2E2', color:'#DC2626', boxShadow:'none'}} onClick={onLogout}>EXIT GAME</button>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setShotType('approach');
+        });
 
-        // WHEEL COMPONENT
-        const RouletteWheel = ({ isSpinning, resultNumber, zone }) => {
-            // Store the random landing angle
-            const [landingAngle, setLandingAngle] = useState(0);
-
-            useEffect(() => {
-                if (!isSpinning && resultNumber) {
-                    // Generate a random angle for the ball to stop at (0-360)
-                    // We align it to a 'slot' so it looks clean
-                    const randomSlot = Math.floor(Math.random() * 12);
-                    const angle = randomSlot * 30; // 0, 30, 60...
-                    setLandingAngle(angle);
-                }
-            }, [isSpinning, resultNumber]);
-
-            // Calculate Wheel Rotation
-            // If Ball is at 'landingAngle', and we want 'resultNumber' to be at that same angle...
-            // Target Number Angle (relative to wheel 0) = (resultNumber - 1) * 30 + 15
-            // Wheel Rotation = landingAngle - Target Number Angle
+        function setShotType(type) {
+            currentType = type;
             
-            const targetNumberAngle = resultNumber ? ((resultNumber - 1) * 30 + 15) : 0;
-            const wheelRotation = landingAngle - targetNumberAngle;
+            // Update Buttons
+            document.querySelectorAll('.control-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${type}`).classList.add('active');
+
+            // Update Center Label
+            document.getElementById('centerLabel').innerText = type.toUpperCase();
             
-            return (
-                <div className="wheel-stage">
-                    <div className="wheel-rim"></div>
-                    
-                    {/* WHEEL SPINS CLOCKWISE */}
-                    <div className={`wheel-spinner ${isSpinning ? 'spinning' : ''}`} style={{
-                        transform: !isSpinning && resultNumber ? `rotate(${wheelRotation}deg)` : 'rotate(0deg)'
-                    }}>
-                        {[...Array(12)].map((_, i) => (
-                            <div key={i} className="wheel-number" style={{
-                                transform: `rotate(${i * 30 + 15}deg) translate(0, -100px)`
-                            }}>
-                                {i + 1}
-                            </div>
-                        ))}
-                    </div>
-                    
-                    {/* BALL SPINS COUNTER-CLOCKWISE */}
-                    <div className={`ball-container ${isSpinning ? 'spinning' : ''}`} style={{
-                         transform: !isSpinning && resultNumber ? `rotate(${landingAngle}deg)` : 'rotate(0deg)'
-                    }}>
-                        <div className="ball"></div>
-                    </div>
-
-                    <div className="wheel-center">
-                        {isSpinning ? (
-                                <div style={{fontSize:10, color:'#FACC15', fontWeight:800}}>SPINNING</div>
-                        ) : (
-                            <>
-                                <div className="result-label-center">{zone}</div>
-                                <div className="result-number-center">{resultNumber || "?"}</div>
-                            </>
-                        )}
-                    </div>
-                </div>
-            );
-        };
-
-        function App() {
-            const [user, setUser] = useState(null);
-            const [gameCode, setGameCode] = useState("");
-            const [gameData, setGameData] = useState(null);
-            const [loading, setLoading] = useState(true);
-            const [zone, setZone] = useState("TEE");
-            const [currentNumber, setCurrentNumber] = useState(null);
-            const [isSpinning, setIsSpinning] = useState(false);
-            const [modal, setModal] = useState({ open: false, title: "", message: "" });
-            const [showSettings, setShowSettings] = useState(false);
-            const [soundOn, setSoundOn] = useState(true);
-            const spinSound = useRef(new Audio("https://cdn.freesound.org/previews/256/256113_3263906-lq.mp3"));
-
-            useEffect(() => {
-                const unsub = window.ops.onAuthStateChanged(window.auth, (u) => {
-                    setUser(u);
-                    setLoading(false);
-                });
-                return () => unsub();
-            }, []);
-
-            useEffect(() => {
-                if (!gameCode) return;
-                let interval;
-                const unsub = window.ops.onSnapshot(window.ops.doc(window.db, "games", gameCode), (doc) => {
-                    if (doc.exists()) {
-                        const data = doc.data();
-                        setGameData(data);
-                        if (data.isSpinning) {
-                            setIsSpinning(true);
-                            if(!interval && soundOn) {
-                                interval = setInterval(() => {
-                                    spinSound.current.currentTime = 0;
-                                    spinSound.current.volume = 0.1;
-                                    spinSound.current.play().catch(e=>{});
-                                }, 100);
-                            }
-                        } else {
-                            setIsSpinning(false);
-                            if(interval) clearInterval(interval);
-                            if(data.lastNumber) setCurrentNumber(data.lastNumber);
-                        }
-                    }
-                });
-                return () => { unsub(); if(interval) clearInterval(interval); };
-            }, [gameCode, soundOn]);
-
-            useEffect(() => { if(window.lucide) window.lucide.createIcons(); });
-
-            const handleLogout = async () => { setShowSettings(false); await window.ops.signOut(window.auth); setGameCode(""); setGameData(null); };
-            const handleLogin = async () => { await window.ops.signInAnonymously(window.auth); };
-            
-            const createGame = async () => {
-                const code = Math.random().toString(36).substring(2, 6).toUpperCase();
-                await window.ops.setDoc(window.ops.doc(window.db, "games", code), {
-                    host: user.uid, lastNumber: null, isSpinning: false, zone: "TEE", createdAt: new Date()
-                });
-                setGameCode(code);
-            };
-            
-            const joinGame = async (codeInput) => {
-                const code = codeInput.toUpperCase();
-                if(code.length !== 4) return;
-                const ref = window.ops.doc(window.db, "games", code);
-                const snap = await window.ops.getDoc(ref);
-                if (snap.exists()) setGameCode(code);
-                else setModal({ open: true, title: "Error", message: "Room not found." });
-            };
-            
-            const handleSpin = async () => {
-                if(isSpinning) return;
-                const ref = window.ops.doc(window.db, "games", gameCode);
-                await window.ops.updateDoc(ref, { isSpinning: true, zone: zone, lastNumber: null });
-                setTimeout(async () => {
-                    const result = Math.floor(Math.random() * 12) + 1;
-                    await window.ops.updateDoc(ref, { isSpinning: false, lastNumber: result });
-                }, 3000); 
-            };
-
-            const Header = () => (
-                <div className="header">
-                    {gameCode && (
-                        <div className="room-info-container">
-                            <div className="room-label">ROOM CODE</div>
-                            <div className="room-code">{gameCode}</div>
-                        </div>
-                    )}
-                    <img src="./images/logo512.png" className="header-logo" />
-                    <div className="header-right">
-                        <button className="header-btn" onClick={() => setShowSettings(true)}>
-                            <i data-lucide="settings" size="24"></i>
-                        </button>
-                    </div>
-                </div>
-            );
-
-            if (loading) return <div className="app-container" style={{justifyContent:'center', alignItems:'center'}}>Loading...</div>;
-
-            // --- 1. START PAGE ---
-            if (!user) return (
-                <div className="app-container">
-                    <div className="game-content">
-                        <div className="top-section" style={{flexDirection:'column'}}>
-                            <img src="./images/logo512.png" style={{width:120, height:120, marginBottom:30}} />
-                            <h1 style={{fontFamily:'var(--font-display)', fontSize:48, lineHeight:1, marginBottom:10, color:'var(--primary)', textAlign:'center'}}>CADDIE<br/>ROULETTE</h1>
-                        </div>
-                        <div className="bottom-section">
-                             <h3 style={{fontSize:16, fontWeight:700, color:'#374151', textTransform:'uppercase', letterSpacing:1, marginBottom:10}}>Your 15th Club</h3>
-                            <p style={{marginBottom:40, color:'#6B7280', fontSize:14, lineHeight:1.6, textAlign:'center', maxWidth:300}}>
-                                Spin for random challenges on the tee, fairway, and green. It won't help your score, but it will change the game.
-                            </p>
-                            <button className="btn btn-primary" onClick={handleLogin}>START ROUND</button>
-                        </div>
-                    </div>
-                </div>
-            );
-
-            // --- 2. JOIN PAGE ---
-            if (!gameCode) return (
-                <div className="app-container">
-                    <Modal isOpen={modal.open} title={modal.title} message={modal.message} onClose={() => setModal({...modal, open: false})} />
-                    <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} soundOn={soundOn} toggleSound={() => setSoundOn(!soundOn)} onLogout={handleLogout} />
-                    
-                    <Header />
-                    <div className="game-content">
-                        <div className="top-section" style={{flexDirection:'column'}}>
-                            <h2 style={{fontFamily:'var(--font-display)', fontSize:32, color:'#374151', marginBottom:30}}>NEW ROUND?</h2>
-                            <button className="btn btn-primary" onClick={createGame} style={{width:'80%', maxWidth:'300px'}}>CREATE ROOM</button>
-                        </div>
-                        <div className="bottom-section">
-                            <p style={{fontSize:12, fontWeight:800, color:'#9CA3AF', marginBottom:20, letterSpacing:1}}>OR JOIN FRIEND</p>
-                            <input id="codeInput" className="input-lg" placeholder="ENTER CODE" maxLength="4" />
-                            <button className="btn btn-accent" onClick={() => joinGame(document.getElementById('codeInput').value)}>
-                                JOIN ROOM
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            );
-
-            // --- 3. GAME PAGE ---
-            return (
-                <div className="app-container">
-                    <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} soundOn={soundOn} toggleSound={() => setSoundOn(!soundOn)} onLogout={handleLogout} />
-                    
-                    <Header />
-                    <div className="game-content">
-                        <div className="top-section">
-                             <RouletteWheel isSpinning={isSpinning} resultNumber={currentNumber} zone={gameData?.zone || 'TEE'} />
-                        </div>
-                        
-                        <div className="bottom-section">
-                            {!isSpinning && currentNumber ? (
-                                <div className="result-container">
-                                        <div className="result-badge-big">{currentNumber}</div>
-                                        <div className="result-text">{CHALLENGES[gameData.zone][currentNumber - 1]}</div>
-                                        <button className="btn btn-primary" onClick={() => setCurrentNumber(null)}>OK</button>
-                                </div>
-                            ) : (
-                                (gameData && gameData.host === user.uid) ? (
-                                    <>
-                                        <div className="zone-selector">
-                                            {['TEE', 'APPROACH', 'GREEN'].map(z => (
-                                                <button key={z} className={`zone-btn ${zone === z ? 'active' : ''}`} onClick={() => setZone(z)}>{z}</button>
-                                            ))}
-                                        </div>
-                                        <button className="btn btn-accent" onClick={handleSpin} disabled={isSpinning} style={{opacity: isSpinning ? 0.6 : 1}}>
-                                            {isSpinning ? 'SPINNING...' : 'SPIN THE WHEEL'}
-                                        </button>
-                                    </>
-                                ) : (
-                                    <div style={{textAlign:'center', color:'#9CA3AF', fontWeight:800, letterSpacing:1}}>
-                                        {isSpinning ? 'HOST IS SPINNING...' : 'WAITING FOR HOST'}
-                                    </div>
-                                )
-                            )}
-                        </div>
-                    </div>
-                </div>
-            );
+            // Clear result
+            document.getElementById('resultDisplay').innerText = "";
+            document.getElementById('centerValue').innerText = "?";
         }
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+
+        function spinWheel() {
+            const spinBtn = document.getElementById('spinBtn');
+            const wheel = document.getElementById('wheel');
+            const centerValue = document.getElementById('centerValue');
+            const resultDisplay = document.getElementById('resultDisplay');
+
+            spinBtn.disabled = true;
+            resultDisplay.innerText = "Spinning...";
+
+            // Random rotation (min 5 spins = 1800deg + random)
+            const randomDegree = Math.floor(Math.random() * 360);
+            const totalSpin = currentRotation + 1800 + randomDegree; 
+            
+            currentRotation = totalSpin;
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+            // Wait for animation to finish (3 seconds match CSS)
+            setTimeout(() => {
+                spinBtn.disabled = false;
+                
+                // Get random challenge from the current list
+                const list = challenges[currentType];
+                const randomChallenge = list[Math.floor(Math.random() * list.length)];
+                
+                // Calculate which number we landed on (Visual only logic for now)
+                // In a real app, you'd calculate exact degrees to map to a number.
+                const randomNum = Math.ceil(Math.random() * 12); 
+                centerValue.innerText = randomNum;
+
+                resultDisplay.innerText = randomChallenge;
+            }, 3000);
+        }
+
+        // Modal Logic
+        const modal = document.getElementById("settingsModal");
+
+        function openModal() {
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        // Close if clicking outside
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
     </script>
 </body>
 </html>
