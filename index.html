@@ -78,7 +78,6 @@
         
         .header-logo { 
             height: 70px; width: 70px; 
-            /* NO DROP SHADOW */
             transition: transform 0.2s;
         }
         
@@ -115,9 +114,9 @@
             padding: 20px; 
             display: flex; 
             flex-direction: column; 
-            justify-content: center; 
             align-items: stretch;
             scrollbar-width: none; 
+            position: relative; /* Context for absolute positioning */
         }
         .game-content::-webkit-scrollbar { display: none; }
         
@@ -159,16 +158,22 @@
         .btn-outline { background: white; border: 2px solid #E5E7EB; color: #374151; box-shadow: 0 4px 0 #E5E7EB; }
         
         /* === ROULETTE WHEEL === */
+        .wheel-container-wrapper {
+            position: relative;
+            display: flex; justify-content: center;
+            margin-bottom: 20px;
+            min-height: 320px; /* Reserve space so it doesn't jump */
+        }
+
         .wheel-stage {
             position: relative;
             width: 300px; height: 300px;
-            margin: 0 auto 20px auto;
             border-radius: 50%;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             background: radial-gradient(circle, transparent 60%, #3e2723 61%, #5d4037 100%);
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0; /* PREVENTS OVAL SQUISHING */
+            flex-shrink: 0; 
         }
         
         .wheel-rim {
@@ -197,24 +202,24 @@
             transform: rotate(0deg);
         }
         
-        /* Infinite Spin Animation */
         .wheel-spinner.spinning { animation: spinCW 0.6s linear infinite; }
         @keyframes spinCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Numbers Overlay */
+        /* CORRECTED NUMBER ALIGNMENT */
         .wheel-number {
             position: absolute;
-            top: 10px; left: 50%;
-            transform-origin: 0 125px; 
+            top: 50%; left: 50%;
             font-family: var(--font-display);
             color: white;
             font-size: 18px;
-            width: 20px; margin-left: -10px;
+            width: 30px; height: 30px;
+            line-height: 30px;
             text-align: center;
+            margin-top: -15px; margin-left: -15px;
             text-shadow: 0 1px 2px black;
         }
 
-        /* Ball Container (Rotates CCW) */
+        /* Ball Container */
         .ball-container {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -249,6 +254,26 @@
         .result-number { font-size: 42px; font-weight: 900; color: white; line-height: 1; }
         .result-label { font-size: 10px; color: #FACC15; font-weight: 700; letter-spacing: 1px; margin-top: 4px; }
 
+        /* RESULT POPUP OVERLAY (PREVENTS LAYOUT SHIFT) */
+        .result-popup {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 280px;
+            background: #1F2937;
+            border: 3px solid #FACC15;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            z-index: 30;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .result-popup-close {
+            margin-top: 15px;
+            background: #374151; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; cursor: pointer;
+        }
+
         /* CONTROLS */
         .zone-selector { display: flex; gap: 8px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 16px; }
         .zone-btn { flex: 1; padding: 12px; border-radius: 12px; border: none; background: transparent; color: rgba(255,255,255,0.6); font-weight: 700; font-size: 11px; cursor: pointer; transition: all 0.2s; }
@@ -261,7 +286,7 @@
         /* MODAL */
         .modal-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px; backdrop-filter: blur(5px); }
         .modal-content { background: white; padding: 24px; border-radius: 24px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; max-height: 85vh; }
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes popIn { from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
 
         /* SETTINGS PAGE */
         .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #E5E7EB; text-align: left; }
@@ -432,49 +457,58 @@
             );
         };
 
-        const RouletteWheel = ({ isSpinning, resultNumber, zone }) => {
-            // Logic: 12 segments (30 degrees each). 
-            // 1 at top (0deg), 2 at 30deg... 
-            // To land on a number at the top, we need to rotate NEGATIVE.
-            // Formula: Rotation = -(resultNumber - 1) * 30
-            
+        const RouletteWheel = ({ isSpinning, resultNumber, zone, onClearResult }) => {
+            // Updated Rotation Logic to keep numbers upright
             return (
-                <div className="wheel-stage">
-                    <div className="wheel-rim"></div>
-                    
-                    <div className={`wheel-spinner ${isSpinning ? 'spinning' : ''}`} style={{
-                        transform: !isSpinning && resultNumber ? `rotate(-${(resultNumber - 1) * 30}deg)` : 'rotate(0deg)'
-                    }}>
-                        {[...Array(12)].map((_, i) => (
-                            <div key={i} className="wheel-number" style={{transform: `rotate(${i * 30}deg)`}}>
-                                {i + 1}
-                            </div>
-                        ))}
-                    </div>
-                    
-                    {/* Ball spins CCW. When stopped, it should be at Top (0deg) */}
-                    <div className={`ball-container ${isSpinning ? 'spinning' : ''}`} style={{
-                         transform: !isSpinning ? 'rotate(0deg)' : ''
-                    }}>
-                        <div className="ball"></div>
+                <div className="wheel-container-wrapper">
+                    <div className="wheel-stage">
+                        <div className="wheel-rim"></div>
+                        
+                        <div className={`wheel-spinner ${isSpinning ? 'spinning' : ''}`} style={{
+                            transform: !isSpinning && resultNumber ? `rotate(-${(resultNumber - 1) * 30}deg)` : 'rotate(0deg)'
+                        }}>
+                            {[...Array(12)].map((_, i) => (
+                                // Rotate the container for placement, then rotate the number back so it's upright
+                                <div key={i} className="wheel-number" style={{
+                                    transform: `rotate(${i * 30}deg) translate(0, -115px) rotate(-${i * 30}deg)`
+                                }}>
+                                    {i + 1}
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className={`ball-container ${isSpinning ? 'spinning' : ''}`} style={{
+                             transform: !isSpinning ? 'rotate(0deg)' : ''
+                        }}>
+                            <div className="ball"></div>
+                        </div>
+
+                        <div className="wheel-center">
+                            {isSpinning ? (
+                                 <div style={{fontSize:12, color:'#FACC15', fontWeight:800}}>SPINNING</div>
+                            ) : (
+                                <>
+                                    <div className="result-label">{zone}</div>
+                                    <div className="result-number">{resultNumber || "?"}</div>
+                                </>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="wheel-center">
-                        {isSpinning ? (
-                             <div style={{fontSize:12, color:'#FACC15', fontWeight:800}}>SPINNING</div>
-                        ) : (
-                            <>
-                                <div className="result-label">{zone}</div>
-                                <div className="result-number">{resultNumber || "?"}</div>
-                            </>
-                        )}
-                    </div>
+                    {/* OVERLAY POPUP FOR RESULT - DOES NOT PUSH LAYOUT */}
+                    {!isSpinning && resultNumber && (
+                        <div className="result-popup">
+                             <div style={{fontSize:10, color:'#FACC15', opacity:0.8, fontWeight:700, letterSpacing:2}}>CHALLENGE #{resultNumber}</div>
+                             <div style={{fontFamily:'var(--font-display)', fontSize:26, color:'white', lineHeight:1.1, marginTop:8}}>{window.getChallengeText(resultNumber, zone)}</div>
+                             <button className="result-popup-close" onClick={onClearResult}>OK</button>
+                        </div>
+                    )}
                 </div>
             );
         };
 
         const PlayerList = ({ players, onScore }) => (
-            <div className="card" style={{padding:0, overflow:'hidden', border:'none'}}>
+            <div className="card" style={{padding:0, overflow:'hidden', border:'none', marginTop:'auto'}}>
                 <div style={{background:'#F3F4F6', padding:'12px 16px', fontSize:11, fontWeight:800, color:'#6B7280', letterSpacing:1}}>LEADERBOARD</div>
                 {players.sort((a,b) => b.score - a.score).map((p, i) => (
                     <div key={i} style={{display:'flex', alignItems:'center', padding:'16px', borderBottom:'1px solid #F3F4F6', background: i===0 ? '#FEF9C3' : 'white'}}>
@@ -492,6 +526,11 @@
             </div>
         );
 
+        // GLOBAL HELPER
+        window.getChallengeText = (num, z) => {
+             return CHALLENGES[z][num - 1] || "Unknown";
+        };
+
         function App() {
             const [user, setUser] = useState(null);
             const [gameCode, setGameCode] = useState("");
@@ -502,7 +541,7 @@
             const [isSpinning, setIsSpinning] = useState(false);
             const [modal, setModal] = useState({ open: false, title: "", message: "", type: "neutral" });
             const [showSettings, setShowSettings] = useState(false);
-            const [showChallenges, setShowChallenges] = useState(false); // New State
+            const [showChallenges, setShowChallenges] = useState(false); 
             const [soundOn, setSoundOn] = useState(true);
             const [installPrompt, setInstallPrompt] = useState(null);
             const spinSound = useRef(new Audio("https://cdn.freesound.org/previews/256/256113_3263906-lq.mp3"));
@@ -578,23 +617,22 @@
                 if(isSpinning) return;
                 const ref = window.ops.doc(window.db, "games", gameCode);
                 try {
-                    await window.ops.updateDoc(ref, { isSpinning: true, zone: zone });
+                    await window.ops.updateDoc(ref, { isSpinning: true, zone: zone, lastNumber: null }); // Clear previous
                     setTimeout(async () => {
                         const result = Math.floor(Math.random() * 12) + 1;
                         await window.ops.updateDoc(ref, { isSpinning: false, lastNumber: result });
                     }, 3000); 
                 } catch (error) { await window.ops.updateDoc(ref, { isSpinning: false }); }
             };
+            const handleClearResult = async () => {
+                 // Locally hide for now or update DB to null if needed
+                 setCurrentNumber(null);
+            };
             const addPoint = async (uid) => {
                 const ref = window.ops.doc(window.db, "games", gameCode);
                 const snap = await window.ops.getDoc(ref);
                 const newPlayers = snap.data().players.map(p => { if (p.uid === uid) return { ...p, score: p.score + 1 }; return p; });
                 await window.ops.updateDoc(ref, { players: newPlayers });
-            };
-            const getChallengeText = () => {
-                if(!currentNumber) return "PRESS SPIN";
-                const z = gameData?.zone || "TEE";
-                return CHALLENGES[z][currentNumber - 1] || "Unknown";
             };
 
             if (loading) return <div className="app-container" style={{justifyContent:'center', alignItems:'center', color:'white'}}>Loading...</div>;
@@ -649,7 +687,7 @@
                     <Header />
 
                     {!gameCode ? (
-                        <div className="game-content">
+                        <div className="game-content" style={{justifyContent:'center'}}>
                              <div className="card" style={{textAlign:'center'}}>
                                 <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:10, marginBottom:20}}>
                                     <img src={user.photoURL} style={{width:40, height:40, borderRadius:'50%'}}/>
@@ -671,15 +709,13 @@
                         </div>
                     ) : (
                         <div className="game-content">
-                            <RouletteWheel isSpinning={isSpinning} resultNumber={currentNumber} zone={gameData?.zone || 'TEE'} />
+                            <RouletteWheel 
+                                isSpinning={isSpinning} 
+                                resultNumber={currentNumber} 
+                                zone={gameData?.zone || 'TEE'} 
+                                onClearResult={handleClearResult}
+                            />
                             
-                            {!isSpinning && currentNumber && (
-                                <div className="card" style={{textAlign:'center', background:'#1F2937', color:'#FACC15', padding:16, border:'2px solid #FACC15'}}>
-                                    <div style={{fontSize:10, color:'white', opacity:0.7, fontWeight:700, letterSpacing:2}}>CHALLENGE #{currentNumber}</div>
-                                    <div style={{fontFamily:'var(--font-display)', fontSize:28, lineHeight:1.1, marginTop:8}}>{getChallengeText()}</div>
-                                </div>
-                            )}
-
                             {(gameData && gameData.host === user.uid) ? (
                                 <div className="card">
                                     <div className="zone-selector">
