@@ -534,7 +534,8 @@
                 return () => { unsub(); if(interval) clearInterval(interval); };
             }, [gameCode, soundOn]);
 
-            useEffect(() => { lucide.createIcons(); }, [user, gameData, loading, showSettings, showChallenges]);
+            // UPDATED: No dependency array ensures it runs on EVERY render to fix disappearing icons
+            useEffect(() => { lucide.createIcons(); });
 
             const handleInstall = () => { if(installPrompt) installPrompt.prompt(); };
             const handleLogout = async () => { setShowSettings(false); await window.ops.signOut(window.auth); setGameCode(""); setGameData(null); };
