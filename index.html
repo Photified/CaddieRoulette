@@ -118,6 +118,8 @@
             animation: slideUp 0.3s ease-out;
             position: relative; 
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
@@ -199,16 +201,15 @@
 
         /* --- FIXED POPUP LAYOUT --- */
         .controls-overlay {
-            position: absolute; 
-            top: 6px; left: 6px; right: 6px; bottom: 6px; /* 6px gap from edges */
-            width: auto; height: auto;
+            position: relative; 
+            width: 100%; height: auto;
             background: #FFFFFF;
             z-index: 50;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             padding: 20px; text-align: center;
             border: 4px solid #DC2626;
             box-shadow: inset 0 0 0 4px #1F2937;
-            border-radius: 18px; /* Slightly tighter radius than container */
+            border-radius: 18px;
             animation: fadeIn 0.2s ease;
         }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -222,6 +223,7 @@
             border: 3px solid #1F2937;
             margin-bottom: 12px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            flex-shrink: 0;
         }
         
         .result-text { 
@@ -229,6 +231,7 @@
             font-size: 26px; 
             line-height: 1.1; margin-bottom: 20px; 
             text-transform: uppercase; padding: 0 10px;
+            word-wrap: break-word;
         }
 
         /* CONTROLS */
@@ -663,30 +666,33 @@
                             />
                             
                             <div className="card">
-                                {(gameData && gameData.host === user.uid) ? (
-                                    <>
-                                        <div className="zone-selector">
-                                            {['TEE', 'APPROACH', 'GREEN'].map(z => (
-                                                <button key={z} className={`zone-btn ${zone === z ? 'active' : ''}`} onClick={() => setZone(z)}>{z}</button>
-                                            ))}
-                                        </div>
-                                        <button className="btn btn-accent" onClick={handleSpin} disabled={isSpinning} style={{fontSize:20, padding:20, opacity: isSpinning ? 0.6 : 1}}>
-                                            {isSpinning ? 'SPINNING...' : 'SPIN THE WHEEL'}
-                                        </button>
-                                    </>
-                                ) : (
-                                    <div style={{textAlign:'center', color:'#374151', fontWeight:800}}>
-                                        {isSpinning ? 'HOST IS SPINNING...' : 'WAITING FOR HOST'}
-                                    </div>
-                                )}
-
-                                {/* NEW COMPACT OVERLAY POPUP */}
-                                {!isSpinning && currentNumber && (
+                                {!isSpinning && currentNumber ? (
+                                    /* NEW LAYOUT: Show Result Overlay INSTEAD of controls */
                                     <div className="controls-overlay">
                                          <div className="result-badge">{currentNumber}</div>
                                          <div className="result-text">{window.getChallengeText(currentNumber, zone)}</div>
                                          <button className="btn btn-primary" onClick={handleClearResult} style={{marginTop:'auto', padding:'12px 30px'}}>OK</button>
                                     </div>
+                                ) : (
+                                    /* DEFAULT LAYOUT: Show Controls */
+                                    <>
+                                        {(gameData && gameData.host === user.uid) ? (
+                                            <>
+                                                <div className="zone-selector">
+                                                    {['TEE', 'APPROACH', 'GREEN'].map(z => (
+                                                        <button key={z} className={`zone-btn ${zone === z ? 'active' : ''}`} onClick={() => setZone(z)}>{z}</button>
+                                                    ))}
+                                                </div>
+                                                <button className="btn btn-accent" onClick={handleSpin} disabled={isSpinning} style={{fontSize:20, padding:20, opacity: isSpinning ? 0.6 : 1}}>
+                                                    {isSpinning ? 'SPINNING...' : 'SPIN THE WHEEL'}
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <div style={{textAlign:'center', color:'#374151', fontWeight:800}}>
+                                                {isSpinning ? 'HOST IS SPINNING...' : 'WAITING FOR HOST'}
+                                            </div>
+                                        )}
+                                    </>
                                 )}
                             </div>
 
