@@ -17,7 +17,7 @@
     <style>
         :root {
             --primary: #064E3B; --primary-light: #059669; --accent: #FACC15; 
-            --bg-body: #064E3B; /* Deep Green Background */
+            --bg-body: #064E3B;
             --glass: #FFFFFF;
             --text-main: #1F2937;
             --font-display: "Impact", "Arial Black", sans-serif;
@@ -33,34 +33,52 @@
             font-family: var(--font-sans); 
             height: 100vh; 
             overflow: hidden; 
+            /* FORCE CENTER ON DESKTOP */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        /* LAYOUT - CENTERING MAGIC */
+        /* LAYOUT - MOBILE FRAME CENTERED */
         .app-container { 
-            max-width: 500px; 
-            margin: 0 auto; 
-            height: 100%; 
+            width: 100%;
+            max-width: 450px; /* Mobile width constraint */
+            height: 100%;
+            max-height: 850px; /* Desktop height constraint */
             display: flex; 
             flex-direction: column; 
             position: relative;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
             background: transparent;
+            /* If on desktop, give it a border/shadow */
+            border-radius: 0px;
+        }
+        @media (min-width: 500px) {
+            .app-container {
+                border-radius: 24px;
+                box-shadow: 0 0 50px rgba(0,0,0,0.5);
+                height: 90vh;
+                overflow: hidden;
+                background: rgba(0,0,0,0.2); /* Slight container dim */
+            }
         }
 
-        /* HEADER - WHITE & CENTERED */
+        /* HEADER */
         .header { 
             background: #FFFFFF; 
-            height: 100px;
+            height: 90px;
             display: flex; 
             justify-content: center; 
             align-items: center; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
             z-index: 20; 
             position: relative;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            flex-shrink: 0;
         }
         
         .header-logo { 
-            height: 80px; width: 80px; 
+            height: 70px; width: 70px; 
             filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));
             transition: transform 0.2s;
         }
@@ -69,7 +87,7 @@
         .header-btn { 
             position: absolute; right: 20px;
             background: #F3F4F6; border: none; color: var(--primary); 
-            padding: 12px; border-radius: 50%; width: 48px; height: 48px;
+            padding: 12px; border-radius: 50%; width: 44px; height: 44px;
             cursor: pointer; display: flex; align-items: center; justify-content: center; 
             transition: background 0.2s;
         }
@@ -82,9 +100,11 @@
             padding: 20px; 
             display: flex; 
             flex-direction: column; 
-            justify-content: center; /* This centers everything vertically */
+            justify-content: center; /* VERTICAL CENTERING MAGIC */
             align-items: stretch;
+            scrollbar-width: none; /* Hide scrollbar Firefox */
         }
+        .game-content::-webkit-scrollbar { display: none; /* Hide scrollbar Chrome */ }
         
         .card { 
             background: var(--glass); 
@@ -98,7 +118,7 @@
 
         /* BUTTONS */
         .btn { 
-            border: none; padding: 18px; border-radius: 16px; 
+            border: none; padding: 16px; border-radius: 14px; 
             font-weight: 800; font-size: 16px; width: 100%; cursor: pointer; 
             transition: all 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; 
             text-transform: uppercase; letter-spacing: 1px;
@@ -122,68 +142,77 @@
 
         .btn-danger { background: #fee2e2; color: #dc2626; font-weight: 700; box-shadow: none; }
         
-        /* THE WHEEL UI */
-        .wheel-container {
+        /* === ROULETTE WHEEL === */
+        .wheel-stage {
             position: relative;
-            width: 280px;
-            height: 280px;
-            margin: 0 auto 30px auto;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 20px auto;
             border-radius: 50%;
-            border: 8px solid #FACC15;
-            box-shadow: 0 0 0 4px #000, 0 20px 50px rgba(0,0,0,0.5);
-            background: #111827;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 10px solid #281D11; /* Wood rim */
+            background: #064E3B;
             overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
         }
 
+        /* The spinning part */
         .wheel-spinner {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: repeating-conic-gradient(
-                #1F2937 0deg 20deg,
-                #374151 20deg 40deg
-            );
+            width: 100%; height: 100%;
             border-radius: 50%;
-            transition: transform 2s cubic-bezier(0.2, 0.8, 0.2, 1); /* Ease out stop */
+            position: relative;
+            transition: transform 3s cubic-bezier(0.1, 0.8, 0.1, 1); /* Spindown ease */
+            background: conic-gradient(
+                #DC2626 0deg 30deg, #111827 30deg 60deg, 
+                #DC2626 60deg 90deg, #111827 90deg 120deg, 
+                #DC2626 120deg 150deg, #111827 150deg 180deg, 
+                #DC2626 180deg 210deg, #111827 210deg 240deg, 
+                #DC2626 240deg 270deg, #111827 270deg 300deg, 
+                #DC2626 300deg 330deg, #111827 330deg 360deg
+            );
         }
         .wheel-spinner.spinning {
-            animation: spin 0.5s linear infinite;
+            animation: spin 0.8s linear infinite;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .wheel-center {
+        /* The Ball Track */
+        .ball-track {
             position: absolute;
-            width: 220px;
-            height: 220px;
-            background: #111827;
+            top: 15px; left: 15px; right: 15px; bottom: 15px;
             border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 2;
-            padding: 20px;
-            text-align: center;
-            border: 4px solid #FACC15;
+            border: 1px solid rgba(255,255,255,0.1);
+            pointer-events: none;
+        }
+        
+        .ball {
+            position: absolute;
+            width: 14px; height: 14px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            top: 50%; left: 50%;
+            /* Ball animation logic is handled in JS/Inline styles */
+            transition: all 0.1s;
         }
 
-        .challenge-text { font-family: var(--font-display); font-size: 28px; text-transform: uppercase; line-height: 1.1; color: #FACC15; text-shadow: 2px 2px 0 #000; }
-        .zone-badge { position: absolute; top: -20px; background: #DC2626; color: white; padding: 6px 16px; border-radius: 20px; font-weight: 800; font-size: 11px; letter-spacing: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); border: 2px solid white; z-index: 10; }
-        
-        /* Pointer Triangle */
-        .wheel-pointer {
-            position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
-            width: 0; height: 0; 
-            border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid white;
-            z-index: 5; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+        /* Center Hub */
+        .wheel-center {
+            position: absolute;
+            width: 140px; height: 140px;
+            background: #111827;
+            border: 4px solid #FACC15;
+            border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
         }
+        .result-number { font-size: 48px; font-weight: 900; color: white; line-height: 1; }
+        .result-label { font-size: 10px; color: #FACC15; font-weight: 700; letter-spacing: 1px; margin-top: 4px; }
 
         /* CONTROLS */
         .zone-selector { display: flex; gap: 8px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 16px; }
-        .zone-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; background: transparent; color: rgba(255,255,255,0.6); font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+        .zone-btn { flex: 1; padding: 12px; border-radius: 12px; border: none; background: transparent; color: rgba(255,255,255,0.6); font-weight: 700; font-size: 11px; cursor: pointer; transition: all 0.2s; }
         .zone-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 
         /* INPUTS */
@@ -191,24 +220,26 @@
         .input-lg:focus { border-color: var(--primary); background: white; }
         
         /* MODAL */
-        .modal-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px; backdrop-filter: blur(8px); }
-        .modal-content { background: white; padding: 24px; border-radius: 24px; width: 100%; max-width: 340px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px; backdrop-filter: blur(5px); }
+        .modal-content { background: white; padding: 24px; border-radius: 24px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; max-height: 80vh; }
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         /* SETTINGS PAGE */
+        .settings-scroll { overflow-y: auto; flex: 1; padding-right: 4px; margin-top: 10px; }
         .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #E5E7EB; text-align: left; }
         .settings-label { font-weight: 600; font-size: 16px; color: #374151; }
         .toggle-switch { width: 50px; height: 28px; background: #E5E7EB; border-radius: 20px; position: relative; cursor: pointer; transition: 0.2s; }
         .toggle-switch.on { background: var(--primary-light); }
         .toggle-circle { width: 24px; height: 24px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .toggle-switch.on .toggle-circle { left: 24px; }
-
-        /* HOW TO GRID */
-        .howto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .howto-item { background: #F9FAFB; padding: 16px 10px; border-radius: 16px; text-align: center; border: 1px solid #E5E7EB; display: flex; flex-direction: column; align-items: center; }
-        .howto-icon-box { background: #DCFCE7; color: #166534; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
-        .howto-text { font-size: 12px; font-weight: 700; color: #4B5563; line-height: 1.3; }
-        .section-title { font-size: 12px; font-weight: 800; color: #9CA3AF; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; text-align: left; }
+        
+        /* CHALLENGE LIST VIEW */
+        .challenge-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .tab-btn { flex: 1; padding: 8px; font-size: 11px; font-weight: 700; background: #F3F4F6; border: none; border-radius: 8px; cursor: pointer; color: #6B7280; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .challenge-item { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #F3F4F6; text-align: left; font-size: 13px; color: #374151; }
+        .challenge-num { width: 24px; height: 24px; background: #111827; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; margin-right: 12px; flex-shrink: 0; }
+        .challenge-num.red { background: #DC2626; }
     </style>
 </head>
 <body>
@@ -238,25 +269,40 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // --- GAME DATA ---
+        // --- GAME DATA (12 Slots) ---
+        // Mapping numbers 1-12 to challenges for each zone
         const CHALLENGES = {
-            TEE: [ "Driver off the Deck", "Hit it with your 7-Iron", "Eyes Closed Swing", "Happy Gilmore Swing", "Wrong Handed Swing", "Yell 'MASHED POTATOES'", "Tee it up extremely high", "No practice swing allowed", "Must hit a fade" ],
-            FAIRWAY: [ "Club up 2 clubs, half swing", "Putter from the fairway", "Baseball Swing", "One handed finish", "Must hit a low stinger", "Stand on one leg", "Opponent picks your club", "Aim 30 yards left, slice it back" ],
-            GREEN: [ "Putt with your Wedge", "Pool Cue Style", "Eyes Closed Putt", "Opponent places your ball", "Putt with the pin in", "Must chip on the green", "Lag putt only" ]
+            TEE: [
+                "Driver off the Deck", "7-Iron Only", "Eyes Closed Swing", 
+                "Happy Gilmore", "Wrong Handed", "Yell 'MASHED POTATOES'",
+                "Tee it High (Driver)", "No Practice Swing", "Must Hit Fade",
+                "Must Hit Draw", "Silence (No Talking)", "Commentate Your Shot"
+            ],
+            APPROACH: [
+                "Club Up 2 (Half Swing)", "Putter from Fairway", "Baseball Grip",
+                "One Handed Finish", "Low Stinger", "Stand on One Leg",
+                "Opponent Picks Club", "Aim Way Left (Slice Back)", "Aim Way Right (Hook Back)",
+                "Eyes Closed Impact", "3-Second Swing", "Yell 'FORE' at Impact"
+            ],
+            GREEN: [
+                "Putt with Wedge", "Pool Cue Style", "Eyes Closed Putt",
+                "Opponent Places Ball", "Pin In", "Chip on Green",
+                "Lag Putt Only", "One Handed Putt", "No Read Allowed",
+                "Knee Putt", "Reverse Grip", "Eyes Open (Normal)"
+            ]
         };
 
         // --- COMPONENTS ---
         const Modal = ({ isOpen, title, message, onClose, type = 'neutral' }) => {
             if (!isOpen) return null;
-            const headerColor = type === 'error' ? '#DC2626' : (type === 'success' ? '#166534' : '#1F2937');
             return (
                 <div className="modal-overlay" onClick={onClose}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <div style={{fontSize: 48, marginBottom: 10}}>
-                            {type === 'error' ? '🏌️‍♂️⚠️' : (type === 'success' ? '🎉' : 'ℹ️')}
+                    <div className="modal-content" onClick={e => e.stopPropagation()} style={{height:'auto'}}>
+                        <div style={{fontSize: 40, marginBottom: 10}}>
+                            {type === 'error' ? '⚠️' : (type === 'success' ? '🎉' : 'ℹ️')}
                         </div>
-                        <h3 style={{color: headerColor, fontSize: 20, fontWeight: 800, marginBottom: 8}}>{title}</h3>
-                        <p style={{color: '#4B5563', marginBottom: 20, lineHeight: 1.5}}>{message}</p>
+                        <h3 style={{fontSize: 20, fontWeight: 800, marginBottom: 8, color: '#1F2937'}}>{title}</h3>
+                        <p style={{color: '#4B5563', marginBottom: 20}}>{message}</p>
                         <button className="btn btn-primary" onClick={onClose}>GOT IT</button>
                     </div>
                 </div>
@@ -264,61 +310,99 @@
         };
 
         const SettingsModal = ({ isOpen, onClose, soundOn, toggleSound, installEvent, onInstall, onLogout }) => {
+            const [activeTab, setActiveTab] = useState('TEE');
+            
             if (!isOpen) return null;
             return (
                 <div className="modal-overlay" onClick={onClose}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()} style={{textAlign:'left'}}>
-                        <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20, borderBottom:'1px solid #E5E7EB', paddingBottom:10}}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()}>
+                        <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10, borderBottom:'1px solid #E5E7EB', paddingBottom:10}}>
                             <h2 style={{fontFamily:'var(--font-display)', fontSize:24, color:'#1F2937'}}>SETTINGS</h2>
                             <button onClick={onClose} style={{border:'none', background:'transparent'}}><i data-lucide="x" color="#9CA3AF"></i></button>
                         </div>
                         
-                        <div className="section-title">HOW IT WORKS</div>
-                        <div className="howto-grid">
-                            <div className="howto-item"><div className="howto-icon-box"><i data-lucide="users"></i></div><div className="howto-text">Host creates a room</div></div>
-                            <div className="howto-item"><div className="howto-icon-box"><i data-lucide="share"></i></div><div className="howto-text">Share the 4-letter code</div></div>
-                            <div className="howto-item"><div className="howto-icon-box"><i data-lucide="target"></i></div><div className="howto-text">Host picks the zone</div></div>
-                            <div className="howto-item"><div className="howto-icon-box"><i data-lucide="trophy"></i></div><div className="howto-text">Spin & win points</div></div>
-                        </div>
-
-                        <div className="section-title">PREFERENCES</div>
-                        <div className="settings-row">
-                            <span className="settings-label">Sound Effects</span>
-                            <div className={`toggle-switch ${soundOn ? 'on' : ''}`} onClick={toggleSound}>
-                                <div className="toggle-circle"></div>
+                        <div className="settings-scroll">
+                            <div style={{fontSize:12, fontWeight:800, color:'#9CA3AF', marginBottom:8, letterSpacing:1}}>CHALLENGE LIST</div>
+                            <div className="challenge-tabs">
+                                {['TEE', 'APPROACH', 'GREEN'].map(t => (
+                                    <button key={t} className={`tab-btn ${activeTab === t ? 'active' : ''}`} onClick={() => setActiveTab(t)}>{t}</button>
+                                ))}
                             </div>
-                        </div>
+                            <div style={{height: 200, overflowY:'auto', border:'1px solid #E5E7EB', borderRadius:12, padding:'0 12px', marginBottom:20}}>
+                                {CHALLENGES[activeTab].map((c, i) => (
+                                    <div key={i} className="challenge-item">
+                                        <div className={`challenge-num ${(i+1)%2 !== 0 ? 'red' : ''}`}>{i+1}</div>
+                                        {c}
+                                    </div>
+                                ))}
+                            </div>
 
-                        {installEvent && (
-                            <div style={{padding:'20px 0'}}>
-                                <button className="btn btn-primary" onClick={onInstall}>
-                                    <i data-lucide="download"></i> INSTALL APP
+                            <div className="settings-row">
+                                <span className="settings-label">Sound Effects</span>
+                                <div className={`toggle-switch ${soundOn ? 'on' : ''}`} onClick={toggleSound}>
+                                    <div className="toggle-circle"></div>
+                                </div>
+                            </div>
+
+                            {installEvent && (
+                                <div style={{padding:'20px 0'}}>
+                                    <button className="btn btn-primary" onClick={onInstall}>
+                                        <i data-lucide="download"></i> INSTALL APP
+                                    </button>
+                                </div>
+                            )}
+
+                            <div style={{marginTop:20, paddingTop:20, borderTop:'1px solid #E5E7EB'}}>
+                                <button className="btn btn-danger" onClick={onLogout}>
+                                    <i data-lucide="log-out"></i> LOG OUT
                                 </button>
                             </div>
-                        )}
-
-                        <div style={{marginTop:20, paddingTop:20, borderTop:'1px solid #E5E7EB'}}>
-                            <button className="btn btn-danger" onClick={onLogout}>
-                                <i data-lucide="log-out"></i> LOG OUT
-                            </button>
                         </div>
                     </div>
                 </div>
             );
         };
 
-        const Wheel = ({ isSpinning, currentText, zone }) => {
+        const RouletteWheel = ({ isSpinning, resultNumber, zone }) => {
+            // Calculate ball position
+            // If spinning: orbit. If stopped: settle on number.
+            // Simplified visualization: 12 segments (30deg each).
+            // Number 1 is at top (0deg). 
+            
+            const wheelRef = useRef(null);
+            
+            // Generate segments visual
             return (
-                <div className="wheel-container">
-                    <div className="wheel-pointer"></div>
-                    <div className={`wheel-spinner ${isSpinning ? 'spinning' : ''}`}></div>
-                    <div className="wheel-center">
-                        <div className="zone-badge">{zone} ZONE</div>
-                        <div className="challenge-text" style={{transform: isSpinning ? 'scale(0.9)' : 'scale(1)', transition: 'transform 0.2s'}}>
-                            {currentText}
-                        </div>
-                        {isSpinning && <div style={{fontSize:10, marginTop:8, color:'rgba(255,255,255,0.5)', fontWeight:700, letterSpacing:1}}>SPINNING...</div>}
+                <div className="wheel-stage">
+                    <div className={`wheel-spinner ${isSpinning ? 'spinning' : ''}`} style={{
+                        transform: !isSpinning && resultNumber ? `rotate(-${(resultNumber - 1) * 30}deg)` : ''
+                    }}>
+                        {/* Segments are drawn by conic gradient in CSS */}
                     </div>
+                    
+                    {/* The Ball */}
+                    <div className="ball-track" style={{
+                         animation: isSpinning ? 'spin 0.6s linear infinite reverse' : 'none',
+                         transform: !isSpinning ? 'rotate(0deg)' : ''
+                    }}>
+                        <div className="ball" style={{
+                            top: -7, left: '50%', transform: 'translateX(-50%)' 
+                        }}></div>
+                    </div>
+
+                    <div className="wheel-center">
+                        {isSpinning ? (
+                             <div style={{fontSize:12, color:'#FACC15', fontWeight:800}}>SPINNING</div>
+                        ) : (
+                            <>
+                                <div className="result-label">{zone}</div>
+                                <div className="result-number">{resultNumber || "?"}</div>
+                            </>
+                        )}
+                    </div>
+                    
+                    {/* Pointer */}
+                    <div style={{position:'absolute', top:0, left:'50%', transform:'translateX(-50%)', width:0, height:0, borderLeft:'10px solid transparent', borderRight:'10px solid transparent', borderTop:'20px solid #FACC15', zIndex:20}}></div>
                 </div>
             );
         };
@@ -348,13 +432,15 @@
             const [gameData, setGameData] = useState(null);
             const [loading, setLoading] = useState(true);
             const [zone, setZone] = useState("TEE");
-            const [localSpinText, setLocalSpinText] = useState("WAITING...");
+            const [currentNumber, setCurrentNumber] = useState(null);
             const [isSpinning, setIsSpinning] = useState(false);
             const [modal, setModal] = useState({ open: false, title: "", message: "", type: "neutral" });
             const [showSettings, setShowSettings] = useState(false);
             const [soundOn, setSoundOn] = useState(true);
             const [installPrompt, setInstallPrompt] = useState(null);
-            const audioRef = useRef(new Audio("https://cdn.freesound.org/previews/256/256113_3263906-lq.mp3"));
+            
+            // Audio Refs
+            const spinSound = useRef(new Audio("https://cdn.freesound.org/previews/256/256113_3263906-lq.mp3")); // Ticking
 
             useEffect(() => {
                 const unsub = window.ops.onAuthStateChanged(window.auth, (u) => {
@@ -368,15 +454,6 @@
                 return () => unsub();
             }, []);
 
-            // SOUND ENGINE
-            const playTick = () => {
-                if(soundOn && audioRef.current) {
-                    audioRef.current.volume = 0.2;
-                    audioRef.current.currentTime = 0;
-                    audioRef.current.play().catch(e => {});
-                }
-            };
-
             // GAME LOOP
             useEffect(() => {
                 if (!gameCode) return;
@@ -389,27 +466,25 @@
                         
                         if (data.isSpinning) {
                             setIsSpinning(true);
-                            // Start Loop
-                            if(!interval) {
+                            if(!interval && soundOn) {
                                 interval = setInterval(() => {
-                                    const list = CHALLENGES[data.zone || 'TEE'];
-                                    setLocalSpinText(list[Math.floor(Math.random() * list.length)]);
-                                    playTick();
-                                }, 80);
+                                    spinSound.current.currentTime = 0;
+                                    spinSound.current.volume = 0.1;
+                                    spinSound.current.play().catch(e=>{});
+                                }, 100);
                             }
                         } else {
                             setIsSpinning(false);
-                            if(interval) clearInterval(interval); // STOP SOUND
-                            if(data.currentChallenge) setLocalSpinText(data.currentChallenge);
+                            if(interval) clearInterval(interval);
+                            if(data.lastNumber) setCurrentNumber(data.lastNumber);
                         }
                     }
                 });
-                
                 return () => {
                     unsub();
                     if(interval) clearInterval(interval);
                 };
-            }, [gameCode, soundOn]); // Add soundOn to deps
+            }, [gameCode, soundOn]);
 
             useEffect(() => { lucide.createIcons(); }, [user, gameData, loading, showSettings]);
 
@@ -417,9 +492,6 @@
             const handleInstall = () => {
                 if(!installPrompt) return;
                 installPrompt.prompt();
-                installPrompt.userChoice.then((choice) => {
-                    if(choice.outcome === 'accepted') setInstallPrompt(null);
-                });
             };
             const handleLogout = async () => { setShowSettings(false); await window.ops.signOut(window.auth); setGameCode(""); setGameData(null); };
             const handleLogin = async () => { await window.ops.signInWithPopup(window.auth, window.provider); };
@@ -428,7 +500,7 @@
                 await window.ops.setDoc(window.ops.doc(window.db, "games", code), {
                     host: user.uid,
                     players: [{ uid: user.uid, name: user.displayName.split(" ")[0], photo: user.photoURL, score: 0 }],
-                    currentChallenge: "HIT 'SPIN'",
+                    lastNumber: null,
                     isSpinning: false,
                     zone: "TEE",
                     createdAt: new Date()
@@ -456,12 +528,12 @@
                 try {
                     await window.ops.updateDoc(ref, { isSpinning: true, zone: zone });
                     setTimeout(async () => {
-                        const list = CHALLENGES[zone];
-                        const result = list[Math.floor(Math.random() * list.length)];
-                        await window.ops.updateDoc(ref, { isSpinning: false, currentChallenge: result });
-                    }, 2500); // Increased spin time slightly
+                        // Pick number 1-12
+                        const result = Math.floor(Math.random() * 12) + 1;
+                        await window.ops.updateDoc(ref, { isSpinning: false, lastNumber: result });
+                    }, 3000); 
                 } catch (error) {
-                    await window.ops.updateDoc(ref, { isSpinning: false, currentChallenge: "ERROR - SPIN AGAIN" });
+                    await window.ops.updateDoc(ref, { isSpinning: false });
                 }
             };
             const addPoint = async (uid) => {
@@ -471,13 +543,21 @@
                 await window.ops.updateDoc(ref, { players: newPlayers });
             };
 
+            // Helpers to get challenge text
+            const getChallengeText = () => {
+                if(!currentNumber) return "PRESS SPIN";
+                const z = gameData?.zone || "TEE";
+                const index = currentNumber - 1; 
+                return CHALLENGES[z][index] || "Unknown";
+            };
+
             // RENDER
             if (loading) return <div className="app-container" style={{justifyContent:'center', alignItems:'center', color:'white'}}>Loading...</div>;
 
             if (!user) return (
                 <div className="app-container" style={{justifyContent:'center'}}>
                      <div className="card" style={{textAlign:'center', margin:'20px'}}>
-                        <img src="./images/logo512.png" className="logo-login" alt="Logo" style={{width:120, height:120, animation:'float 3s ease-in-out infinite'}} />
+                        <img src="./images/logo512.png" className="header-logo" style={{width:100, height:100, margin:'0 auto 20px'}} />
                         <h1 style={{fontFamily:'var(--font-display)', fontSize:32, lineHeight:1, marginBottom:10, color:'var(--primary)'}}>CADDIE ROULETTE</h1>
                         <p style={{marginBottom:30, color:'#6B7280'}}>The ultimate golf party game.</p>
                         <button className="btn btn-primary" onClick={handleLogin}>
@@ -490,9 +570,9 @@
             const Header = () => (
                 <div className="header">
                     <img src="./images/logo512.png" className="header-logo" />
-                    <div style={{position:'absolute', right:20, top:20}}>
+                    <div style={{position:'absolute', right:20}}>
                         {gameCode && (
-                            <div style={{position:'absolute', right:60, top:5, textAlign:'right', color:'#1F2937'}}>
+                            <div style={{position:'absolute', right:60, top:8, textAlign:'right', color:'#1F2937'}}>
                                 <div style={{fontSize:9, fontWeight:800, opacity:0.5}}>ROOM</div>
                                 <div style={{fontFamily:'var(--font-display)', fontSize:24, letterSpacing:1}}>{gameCode}</div>
                             </div>
@@ -534,12 +614,20 @@
                         </div>
                     ) : (
                         <div className="game-content">
-                            <Wheel isSpinning={isSpinning} currentText={localSpinText} zone={gameData?.zone || 'TEE'} />
+                            <RouletteWheel isSpinning={isSpinning} resultNumber={currentNumber} zone={gameData?.zone || 'TEE'} />
+                            
+                            {/* CHALLENGE DISPLAY CARD */}
+                            {!isSpinning && currentNumber && (
+                                <div className="card" style={{textAlign:'center', background:'#1F2937', color:'#FACC15', padding:16, border:'2px solid #FACC15'}}>
+                                    <div style={{fontSize:10, color:'white', opacity:0.7, fontWeight:700, letterSpacing:2}}>CHALLENGE #{currentNumber}</div>
+                                    <div style={{fontFamily:'var(--font-display)', fontSize:28, lineHeight:1.1, marginTop:8}}>{getChallengeText()}</div>
+                                </div>
+                            )}
 
                             {(gameData && gameData.host === user.uid) ? (
                                 <div className="card">
                                     <div className="zone-selector">
-                                        {['TEE', 'FAIRWAY', 'GREEN'].map(z => (
+                                        {['TEE', 'APPROACH', 'GREEN'].map(z => (
                                             <button key={z} className={`zone-btn ${zone === z ? 'active' : ''}`} onClick={() => setZone(z)}>{z}</button>
                                         ))}
                                     </div>
