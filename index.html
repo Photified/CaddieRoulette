@@ -55,7 +55,7 @@
 
         /* HEADER */
         .header { 
-            height: 70px; /* Increased height for label */
+            height: 70px; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -69,7 +69,7 @@
         .header-right { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
         .header-btn { background: transparent; border: none; cursor: pointer; color: #9CA3AF; padding: 8px; }
 
-        /* NEW ROOM CODE STYLES */
+        /* ROOM CODE STYLES */
         .room-info-container {
             position: absolute; 
             left: 20px; 
@@ -204,17 +204,17 @@
         /* UPDATED ZONE SELECTOR: Wider with Gaps */
         .zone-selector { 
             display: flex; 
-            gap: 12px; /* Adds padding between buttons */
+            gap: 12px; 
             margin-bottom: 30px; 
             background: transparent; 
             width: 100%; 
         }
         .zone-btn { 
             flex: 1; 
-            padding: 16px 0; 
+            padding: 16px 4px; /* Added 4px side padding to prevent text touching edges */
             border-radius: 12px; 
             border: none; 
-            background: #F3F4F6; /* Default background for inactive */
+            background: #F3F4F6; 
             color: #9CA3AF; 
             font-weight: 800; 
             font-size: 11px; 
@@ -223,7 +223,7 @@
             transition: 0.2s;
         }
         .zone-btn.active { 
-            background: var(--primary); /* Active background */
+            background: var(--primary); 
             color: white; 
             box-shadow: 0 4px 12px rgba(6, 78, 59, 0.3); 
         }
@@ -246,17 +246,38 @@
         .input-lg:focus { border-color: var(--primary); background: white; }
 
         .modal-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
-        .modal-content { background: white; width: 100%; max-width: 400px; text-align: center; display: flex; flex-direction: column; }
+        .modal-content { background: white; width: 100%; max-width: 400px; text-align: center; display: flex; flex-direction: column; max-height: 90vh; }
         
-        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #F3F4F6; text-align: left; width: 100%; }
+        /* SETTINGS & TABS */
+        .modal-tabs { display: flex; width: 100%; border-bottom: 1px solid #F3F4F6; margin-bottom: 20px; }
+        .modal-tab { flex: 1; padding: 14px; text-align: center; font-weight: 800; font-size: 12px; color: #9CA3AF; cursor: pointer; border-bottom: 2px solid transparent; letter-spacing: 1px; }
+        .modal-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        .settings-content { overflow-y: auto; padding: 0 10px; width: 100%; }
+
+        .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #F3F4F6; text-align: left; width: 100%; }
         .toggle-switch { width: 50px; height: 30px; background: #E5E7EB; border-radius: 30px; position: relative; cursor: pointer; transition: 0.2s; }
         .toggle-switch.on { background: var(--primary); }
         .toggle-circle { width: 26px; height: 26px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .toggle-switch.on .toggle-circle { left: 22px; }
 
-        .challenge-item { display: flex; align-items: center; padding: 14px 0; border-bottom: 1px solid #F3F4F6; text-align: left; font-size: 14px; color: #374151; font-weight: 600; }
-        .challenge-num { width: 28px; height: 28px; background: #111827; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; margin-right: 14px; flex-shrink: 0; }
+        /* HOW TO */
+        .howto-section { margin-bottom: 30px; }
+        .howto-step { display: flex; align-items: flex-start; margin-bottom: 16px; text-align: left; }
+        .howto-num { width: 28px; height: 28px; background: #E5E7EB; color: #374151; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; margin-right: 12px; flex-shrink: 0; }
+        .howto-text { font-size: 14px; color: #4B5563; line-height: 1.4; padding-top: 4px; font-weight: 500; }
+        .howto-title { font-size: 12px; font-weight: 800; color: #9CA3AF; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; text-align: left; display: block; }
+
+        /* RULES LIST */
+        .rules-zone-nav { display: flex; gap: 8px; margin-bottom: 15px; }
+        .rules-zone-btn { flex: 1; padding: 8px 0; font-size: 10px; font-weight: 800; background: #F3F4F6; border-radius: 8px; border:none; color: #9CA3AF; cursor: pointer; }
+        .rules-zone-btn.active { background: #1F2937; color: white; }
+
+        .challenge-list { text-align: left; }
+        .challenge-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #F3F4F6; font-size: 13px; color: #374151; font-weight: 600; }
+        .challenge-num { width: 24px; height: 24px; background: #111827; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; margin-right: 12px; flex-shrink: 0; }
         .challenge-num.red { background: #DC2626; }
+
     </style>
 </head>
 <body>
@@ -310,7 +331,7 @@
             if (!isOpen) return null;
             return (
                 <div className="modal-overlay" onClick={onClose}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()}>
+                    <div className="modal-content" style={{padding: 20}} onClick={e => e.stopPropagation()}>
                         <h3 style={{fontSize: 24, fontWeight: 900, marginBottom: 10, color: '#1F2937', textTransform:'uppercase'}}>{title}</h3>
                         <p style={{color: '#4B5563', marginBottom: 30, fontSize:16, lineHeight:1.5}}>{message}</p>
                         <button className="btn btn-primary" onClick={onClose}>GOT IT</button>
@@ -320,22 +341,75 @@
         };
 
         const SettingsModal = ({ isOpen, onClose, soundOn, toggleSound, onLogout }) => {
+            const [tab, setTab] = useState('SETTINGS');
+            const [viewZone, setViewZone] = useState('TEE');
+
             if (!isOpen) return null;
             return (
                 <div className="modal-overlay" onClick={onClose}>
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:30}}>
-                            <h2 style={{fontFamily:'var(--font-display)', fontSize:32, color:'#1F2937'}}>SETTINGS</h2>
-                            <button onClick={onClose} style={{border:'none', background:'transparent'}}><i data-lucide="x" color="#9CA3AF" size="28"></i></button>
+                        {/* HEADER WITH CLOSE */}
+                        <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'20px 20px 0 20px'}}>
+                            <h2 style={{fontFamily:'var(--font-display)', fontSize:28, color:'#1F2937'}}>MENU</h2>
+                            <button onClick={onClose} style={{border:'none', background:'transparent'}}><i data-lucide="x" color="#9CA3AF" size="24"></i></button>
                         </div>
-                        <div className="settings-row">
-                             <span style={{fontWeight:700, fontSize:18, color:'#374151'}}>Sound Effects</span>
-                             <div className={`toggle-switch ${soundOn ? 'on' : ''}`} onClick={toggleSound}>
-                                 <div className="toggle-circle"></div>
-                             </div>
+
+                        {/* TABS */}
+                        <div className="modal-tabs">
+                            <div className={`modal-tab ${tab === 'SETTINGS' ? 'active' : ''}`} onClick={() => setTab('SETTINGS')}>SETTINGS</div>
+                            <div className={`modal-tab ${tab === 'RULES' ? 'active' : ''}`} onClick={() => setTab('RULES')}>CHALLENGES</div>
                         </div>
-                        <div style={{marginTop:40}}>
-                            <button className="btn btn-primary" style={{background:'#FEE2E2', color:'#DC2626', boxShadow:'none'}} onClick={onLogout}>EXIT GAME</button>
+
+                        <div className="settings-content">
+                            {tab === 'SETTINGS' ? (
+                                <>
+                                    <div className="howto-section">
+                                        <span className="howto-title">How To Play</span>
+                                        <div className="howto-step">
+                                            <div className="howto-num">1</div>
+                                            <div className="howto-text">Host selects the Zone (Tee, Approach, or Green) based on where your group is.</div>
+                                        </div>
+                                        <div className="howto-step">
+                                            <div className="howto-num">2</div>
+                                            <div className="howto-text">Host spins the wheel. The result syncs to everyone's phone.</div>
+                                        </div>
+                                        <div className="howto-step">
+                                            <div className="howto-num">3</div>
+                                            <div className="howto-text">Perform the challenge for that shot. If you refuse, take a penalty stroke (or a drink).</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="settings-row" style={{borderTop:'1px solid #F3F4F6'}}>
+                                         <span style={{fontWeight:700, fontSize:16, color:'#374151'}}>Sound Effects</span>
+                                         <div className={`toggle-switch ${soundOn ? 'on' : ''}`} onClick={toggleSound}>
+                                             <div className="toggle-circle"></div>
+                                         </div>
+                                    </div>
+                                    
+                                    <div style={{marginTop:30, marginBottom: 20}}>
+                                        <button className="btn btn-primary" style={{background:'#FEE2E2', color:'#DC2626', boxShadow:'none', fontSize: 14, padding: '16px 0'}} onClick={onLogout}>EXIT GAME</button>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="rules-zone-nav">
+                                        {Object.keys(CHALLENGES).map(z => (
+                                            <button key={z} className={`rules-zone-btn ${viewZone === z ? 'active' : ''}`} onClick={() => setViewZone(z)}>
+                                                {z}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="challenge-list">
+                                        {CHALLENGES[viewZone].map((c, i) => (
+                                            <div className="challenge-item" key={i}>
+                                                <div className={`challenge-num ${i % 2 === 0 ? 'red' : ''}`}>{i + 1}</div>
+                                                <span>{c}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div style={{height: 20}}></div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -344,24 +418,16 @@
 
         // WHEEL COMPONENT
         const RouletteWheel = ({ isSpinning, resultNumber, zone }) => {
-            // Store the random landing angle
             const [landingAngle, setLandingAngle] = useState(0);
 
             useEffect(() => {
                 if (!isSpinning && resultNumber) {
-                    // Generate a random angle for the ball to stop at (0-360)
-                    // We align it to a 'slot' so it looks clean
                     const randomSlot = Math.floor(Math.random() * 12);
-                    const angle = randomSlot * 30; // 0, 30, 60...
+                    const angle = randomSlot * 30; 
                     setLandingAngle(angle);
                 }
             }, [isSpinning, resultNumber]);
 
-            // Calculate Wheel Rotation
-            // If Ball is at 'landingAngle', and we want 'resultNumber' to be at that same angle...
-            // Target Number Angle (relative to wheel 0) = (resultNumber - 1) * 30 + 15
-            // Wheel Rotation = landingAngle - Target Number Angle
-            
             const targetNumberAngle = resultNumber ? ((resultNumber - 1) * 30 + 15) : 0;
             const wheelRotation = landingAngle - targetNumberAngle;
             
@@ -369,7 +435,6 @@
                 <div className="wheel-stage">
                     <div className="wheel-rim"></div>
                     
-                    {/* WHEEL SPINS CLOCKWISE */}
                     <div className={`wheel-spinner ${isSpinning ? 'spinning' : ''}`} style={{
                         transform: !isSpinning && resultNumber ? `rotate(${wheelRotation}deg)` : 'rotate(0deg)'
                     }}>
@@ -382,7 +447,6 @@
                         ))}
                     </div>
                     
-                    {/* BALL SPINS COUNTER-CLOCKWISE */}
                     <div className={`ball-container ${isSpinning ? 'spinning' : ''}`} style={{
                          transform: !isSpinning && resultNumber ? `rotate(${landingAngle}deg)` : 'rotate(0deg)'
                     }}>
