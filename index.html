@@ -7,7 +7,7 @@
     
     <link rel="manifest" href="./manifest.json" />
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#064E3B">
+    <meta name="theme-color" content="#ffffff">
 
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -38,37 +38,45 @@
             justify-content: center;
         }
         
-        /* LAYOUT - FIXED FLOATING CARD LOOK FOR MOBILE */
+        /* LAYOUT */
         .app-container { 
-            width: 95%; /* Leave slight gap on sides */
+            width: 100%;
             max-width: 450px; 
-            height: 95vh; /* Leave slight gap on top/bottom */
+            height: 100%;
             max-height: 850px; 
             display: flex; 
             flex-direction: column; 
             position: relative;
-            background: rgba(0,0,0,0.2); /* Subtle dim backing */
-            border-radius: 24px; /* Rounded corners everywhere */
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            overflow: hidden; /* Clips the header corners */
+            background: transparent;
+        }
+        @media (min-width: 500px) {
+            .app-container {
+                border-radius: 24px;
+                box-shadow: 0 0 50px rgba(0,0,0,0.5);
+                height: 90vh;
+                overflow: hidden;
+                background: rgba(0,0,0,0.2); 
+            }
         }
 
         /* HEADER */
         .header { 
             background: #FFFFFF; 
-            height: 80px; /* Slightly shorter for mobile fit */
+            height: 90px;
             display: flex; 
             align-items: center; 
             justify-content: center; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
             z-index: 20; 
             position: relative;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
             flex-shrink: 0;
             padding: 0 20px;
         }
         
         .header-logo { 
-            height: 60px; width: 60px; 
+            height: 70px; width: 70px; 
             transition: transform 0.2s;
         }
         
@@ -77,12 +85,12 @@
             display: flex; flex-direction: column; align-items: flex-start;
         }
         .room-label { font-size: 9px; font-weight: 800; color: #9CA3AF; letter-spacing: 1px; text-transform: uppercase; }
-        .room-code { font-family: var(--font-display); font-size: 24px; color: #1F2937; line-height: 1; letter-spacing: 1px; }
+        .room-code { font-family: var(--font-display); font-size: 28px; color: #1F2937; line-height: 1; letter-spacing: 1px; }
 
         .header-right { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
         .header-btn { 
             background: #F3F4F6; border: none; color: var(--primary); 
-            padding: 8px; border-radius: 12px; width: 40px; height: 40px;
+            padding: 10px; border-radius: 12px; width: 44px; height: 44px;
             cursor: pointer; display: flex; align-items: center; justify-content: center; 
             transition: background 0.2s;
         }
@@ -92,7 +100,7 @@
         .game-content { 
             flex: 1; 
             overflow-y: auto; 
-            padding: 15px; 
+            padding: 20px; 
             display: flex; 
             flex-direction: column; 
             align-items: stretch;
@@ -103,10 +111,10 @@
         
         .card { 
             background: var(--glass); 
-            padding: 20px; 
-            border-radius: 20px; 
+            padding: 16px; /* TIGHTER PADDING */
+            border-radius: 24px; 
             box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
-            margin-bottom: 15px; 
+            margin-bottom: 20px; 
             animation: slideUp 0.3s ease-out;
             position: relative; 
             overflow: hidden;
@@ -115,7 +123,7 @@
 
         /* BUTTONS */
         .btn { 
-            border: none; padding: 14px; border-radius: 12px; 
+            border: none; padding: 16px; border-radius: 14px; 
             font-weight: 800; font-size: 16px; width: 100%; cursor: pointer; 
             transition: all 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; 
             text-transform: uppercase; letter-spacing: 1px;
@@ -130,20 +138,17 @@
         
         /* WHEEL STYLES */
         .wheel-container-wrapper {
-            position: relative; display: flex; justify-content: center; margin-bottom: 15px; min-height: 280px;
+            position: relative; display: flex; justify-content: center; margin-bottom: 20px; min-height: 300px;
         }
         .wheel-stage {
-            position: relative; width: 280px; height: 280px; border-radius: 50%;
+            position: relative; width: 300px; height: 300px; border-radius: 50%;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            background: radial-gradient(circle, transparent 60%, #3e2723 61%, #5d4037 100%);
+            background: #281D11; /* Dark wood rim color */
             overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
-        .wheel-rim {
-            position: absolute; width: 250px; height: 250px; border-radius: 50%;
-            border: 8px solid #B45309; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); z-index: 5; pointer-events: none;
-        }
+        /* SPINNER IS NOW LARGER TO PUSH COLORS TO EDGE */
         .wheel-spinner {
-            width: 250px; height: 250px; border-radius: 50%; position: relative;
+            width: 290px; height: 290px; border-radius: 50%; position: relative;
             transition: transform 3s cubic-bezier(0.2, 0.8, 0.1, 1); 
             background: conic-gradient(
                 #DC2626 0deg 30deg, #1F2937 30deg 60deg, 
@@ -154,14 +159,15 @@
                 #DC2626 300deg 330deg, #1F2937 330deg 360deg
             );
             transform: rotate(0deg);
+            border: 2px solid rgba(0,0,0,0.2); /* Slight inner border */
         }
         .wheel-spinner.spinning { animation: spinCW 0.6s linear infinite; }
         @keyframes spinCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* FIXED: RADIAL NUMBERS (Facing Center) */
+        /* NUMBERS PUSHED OUT FURTHER (-120px) */
         .wheel-number {
             position: absolute; top: 50%; left: 50%;
-            font-family: var(--font-display); color: white; font-size: 16px; width: 20px; height: 20px; line-height: 20px; text-align: center;
+            font-family: var(--font-display); color: white; font-size: 18px; width: 20px; height: 20px; line-height: 20px; text-align: center;
             margin-top: -10px; margin-left: -10px; text-shadow: 0 1px 2px black;
         }
 
@@ -171,47 +177,54 @@
         .ball-container.spinning { animation: spinCCW 1.5s linear infinite; }
         @keyframes spinCCW { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
         .ball {
-            position: absolute; top: 25px; left: 50%; margin-left: -6px; width: 12px; height: 12px;
+            position: absolute; top: 15px; left: 50%; margin-left: -6px; width: 12px; height: 12px;
             background: #FFFFFF; border-radius: 50%; box-shadow: 0 0 4px rgba(0,0,0,0.8);
         }
         .ball-container.spinning .ball { animation: bounce 0.3s ease-in-out infinite alternate; }
-        @keyframes bounce { from { top: 25px; } to { top: 20px; } }
+        @keyframes bounce { from { top: 15px; } to { top: 10px; } }
 
         .wheel-center {
-            position: absolute; width: 110px; height: 110px; background: #111827; border: 4px solid #FACC15;
+            position: absolute; width: 120px; height: 120px; background: #111827; border: 4px solid #FACC15;
             border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center;
             z-index: 20; box-shadow: 0 0 20px rgba(0,0,0,0.8);
         }
         .result-number { font-size: 42px; font-weight: 900; color: white; line-height: 1; }
         .result-label { font-size: 10px; color: #FACC15; font-weight: 700; letter-spacing: 1px; margin-top: 4px; }
 
-        /* --- FIXED COMPACT RESULT POPUP --- */
+        /* --- UPDATED CONTROLS OVERLAY --- */
         .controls-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #FFFFFF;
             z-index: 50;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 10px; text-align: center; /* Compact Padding */
-            border: 4px solid #DC2626;
-            box-shadow: inset 0 0 0 2px white, 0 0 0 4px #111827;
+            padding: 10px; text-align: center;
+            border: 4px solid #DC2626; /* Red Border */
+            box-shadow: inset 0 0 0 4px #FFFFFF, inset 0 0 0 6px #1F2937; /* Double stroke visual trick */
             border-radius: 20px;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.2s ease;
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
-        .result-title { 
-            color: #DC2626; font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; 
-            border-bottom: 2px solid #F3F4F6; padding-bottom: 4px; width: 80%;
+        /* BADGE STYLE NUMBER */
+        .result-badge {
+            background: #DC2626; color: white;
+            width: 50px; height: 50px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-display); font-size: 24px;
+            border: 4px solid #1F2937;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
+        
         .result-text { 
             color: #1F2937; font-family: var(--font-display); 
-            font-size: 24px; /* Reduced Size */
-            line-height: 1.1; margin-bottom: 15px; 
-            text-transform: uppercase;
+            font-size: 28px; /* Slightly Larger/Bold */
+            line-height: 1.1; margin-bottom: 20px; 
+            text-transform: uppercase; padding: 0 10px;
         }
 
         /* CONTROLS */
-        .zone-selector { display: flex; gap: 8px; margin-bottom: 15px; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 16px; }
+        .zone-selector { display: flex; gap: 8px; margin-bottom: 12px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 16px; }
         .zone-btn { flex: 1; padding: 12px; border-radius: 12px; border: none; background: transparent; color: rgba(255,255,255,0.6); font-weight: 700; font-size: 11px; cursor: pointer; transition: all 0.2s; }
         .zone-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 
@@ -394,8 +407,11 @@
         };
 
         const RouletteWheel = ({ isSpinning, resultNumber, zone, onClearResult }) => {
-            // Updated Rotation Logic to keep numbers FACING CENTER
-            // We just rotate position (i*30+15), no counter-rotation.
+            // FIXED ROTATION MATH:
+            // 1. Center of segment is +15deg. 
+            // 2. To put Center at Top (0deg), we rotate NEGATIVE.
+            // 3. Formula: -( (Num-1)*30 + 15 )
+            
             return (
                 <div className="wheel-container-wrapper">
                     <div className="wheel-stage">
@@ -405,9 +421,10 @@
                             transform: !isSpinning && resultNumber ? `rotate(-${(resultNumber - 1) * 30 + 15}deg)` : 'rotate(0deg)'
                         }}>
                             {[...Array(12)].map((_, i) => (
-                                // Place at center of wedge (i*30 + 15), Translate Out. Text naturally points to center.
+                                // Place at center of wedge (i*30 + 15), Translate Out to 120px. 
+                                // Text is naturally upright relative to center.
                                 <div key={i} className="wheel-number" style={{
-                                    transform: `rotate(${i * 30 + 15}deg) translate(0, -110px)`
+                                    transform: `rotate(${i * 30 + 15}deg) translate(0, -120px)`
                                 }}>
                                     {i + 1}
                                 </div>
@@ -661,12 +678,12 @@
                                     </div>
                                 )}
 
-                                {/* NEW COMPACT OVERLAY POPUP */}
+                                {/* NEW VISUAL POPUP OVERLAY */}
                                 {!isSpinning && currentNumber && (
                                     <div className="controls-overlay">
-                                         <div className="result-title">CHALLENGE #{currentNumber}</div>
+                                         <div className="result-badge">{currentNumber}</div>
                                          <div className="result-text">{window.getChallengeText(currentNumber, zone)}</div>
-                                         <button className="btn btn-primary" onClick={handleClearResult} style={{marginTop:'auto'}}>OK</button>
+                                         <button className="btn btn-primary" onClick={handleClearResult} style={{marginTop:'auto', padding: '12px 30px'}}>OK</button>
                                     </div>
                                 )}
                             </div>
