@@ -49,8 +49,6 @@
             flex-direction: column; 
             position: relative;
             background: transparent;
-            /* If on desktop, give it a border/shadow */
-            border-radius: 0px;
         }
         @media (min-width: 500px) {
             .app-container {
@@ -58,7 +56,7 @@
                 box-shadow: 0 0 50px rgba(0,0,0,0.5);
                 height: 90vh;
                 overflow: hidden;
-                background: rgba(0,0,0,0.2); /* Slight container dim */
+                background: rgba(0,0,0,0.2); 
             }
         }
 
@@ -67,44 +65,57 @@
             background: #FFFFFF; 
             height: 90px;
             display: flex; 
-            justify-content: center; 
             align-items: center; 
+            justify-content: center; /* Center Logo */
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
             z-index: 20; 
             position: relative;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
             flex-shrink: 0;
+            padding: 0 20px;
         }
         
         .header-logo { 
             height: 70px; width: 70px; 
-            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));
+            /* NO DROP SHADOW as requested */
             transition: transform 0.2s;
         }
-        .header-logo:active { transform: scale(0.95); }
+        
+        /* LEFT SIDE (Code) */
+        .header-left {
+            position: absolute;
+            left: 20px;
+            display: flex; flex-direction: column; align-items: flex-start;
+        }
+        .room-label { font-size: 9px; font-weight: 800; color: #9CA3AF; letter-spacing: 1px; text-transform: uppercase; }
+        .room-code { font-family: var(--font-display); font-size: 28px; color: #1F2937; line-height: 1; letter-spacing: 1px; }
 
+        /* RIGHT SIDE (Settings) */
+        .header-right {
+            position: absolute;
+            right: 20px;
+        }
         .header-btn { 
-            position: absolute; right: 20px;
             background: #F3F4F6; border: none; color: var(--primary); 
-            padding: 12px; border-radius: 50%; width: 44px; height: 44px;
+            padding: 10px; border-radius: 12px; width: 44px; height: 44px;
             cursor: pointer; display: flex; align-items: center; justify-content: center; 
             transition: background 0.2s;
         }
         .header-btn:active { background: #E5E7EB; transform: scale(0.95); }
 
-        /* CONTENT - VERTICALLY CENTERED */
+        /* CONTENT */
         .game-content { 
             flex: 1; 
             overflow-y: auto; 
             padding: 20px; 
             display: flex; 
             flex-direction: column; 
-            justify-content: center; /* VERTICAL CENTERING MAGIC */
+            justify-content: center; 
             align-items: stretch;
-            scrollbar-width: none; /* Hide scrollbar Firefox */
+            scrollbar-width: none; 
         }
-        .game-content::-webkit-scrollbar { display: none; /* Hide scrollbar Chrome */ }
+        .game-content::-webkit-scrollbar { display: none; }
         
         .card { 
             background: var(--glass); 
@@ -141,73 +152,103 @@
         .btn-accent:active { box-shadow: 0 0 0 #854D0E; transform: translateY(6px); }
 
         .btn-danger { background: #fee2e2; color: #dc2626; font-weight: 700; box-shadow: none; }
+        .btn-outline { background: white; border: 2px solid #E5E7EB; color: #374151; box-shadow: 0 4px 0 #E5E7EB; }
         
-        /* === ROULETTE WHEEL === */
+        /* === NEW ROULETTE WHEEL === */
         .wheel-stage {
             position: relative;
-            width: 300px;
-            height: 300px;
+            width: 300px; height: 300px;
             margin: 0 auto 20px auto;
             border-radius: 50%;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            border: 10px solid #281D11; /* Wood rim */
-            background: #064E3B;
+            /* Wood Rim Texture */
+            background: radial-gradient(circle, transparent 60%, #3e2723 61%, #5d4037 100%);
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
         }
-
-        /* The spinning part */
-        .wheel-spinner {
-            width: 100%; height: 100%;
-            border-radius: 50%;
-            position: relative;
-            transition: transform 3s cubic-bezier(0.1, 0.8, 0.1, 1); /* Spindown ease */
-            background: conic-gradient(
-                #DC2626 0deg 30deg, #111827 30deg 60deg, 
-                #DC2626 60deg 90deg, #111827 90deg 120deg, 
-                #DC2626 120deg 150deg, #111827 150deg 180deg, 
-                #DC2626 180deg 210deg, #111827 210deg 240deg, 
-                #DC2626 240deg 270deg, #111827 270deg 300deg, 
-                #DC2626 300deg 330deg, #111827 330deg 360deg
-            );
-        }
-        .wheel-spinner.spinning {
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* The Ball Track */
-        .ball-track {
+        
+        /* Metallic Inner Rim */
+        .wheel-rim {
             position: absolute;
-            top: 15px; left: 15px; right: 15px; bottom: 15px;
+            width: 270px; height: 270px;
             border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 8px solid #B45309; /* Bronze */
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            z-index: 5;
             pointer-events: none;
         }
+
+        /* The Numbers Ring */
+        .wheel-spinner {
+            width: 270px; height: 270px;
+            border-radius: 50%;
+            position: relative;
+            transition: transform 3s cubic-bezier(0.2, 0.8, 0.1, 1); /* Spindown ease */
+            /* 12 Segments Conic Gradient */
+            background: conic-gradient(
+                #DC2626 0deg 30deg, #1F2937 30deg 60deg, 
+                #DC2626 60deg 90deg, #1F2937 90deg 120deg, 
+                #DC2626 120deg 150deg, #1F2937 150deg 180deg, 
+                #DC2626 180deg 210deg, #1F2937 210deg 240deg, 
+                #DC2626 240deg 270deg, #1F2937 270deg 300deg, 
+                #DC2626 300deg 330deg, #1F2937 330deg 360deg
+            );
+            transform: rotate(0deg);
+        }
         
+        /* Animation: Wheel spins Clockwise */
+        .wheel-spinner.spinning { animation: spinCW 2s linear infinite; }
+        @keyframes spinCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Numbers Overlay (positioned absolute on spinner) */
+        .wheel-number {
+            position: absolute;
+            top: 10px; left: 50%;
+            transform-origin: 0 125px; /* Radius of spinner - padding */
+            font-family: var(--font-display);
+            color: white;
+            font-size: 18px;
+            width: 20px; margin-left: -10px;
+            text-align: center;
+            text-shadow: 0 1px 2px black;
+        }
+
+        /* The Ball Container (Rotates Counter-Clockwise) */
+        .ball-container {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        /* Ball Animation: Spin CCW + Bounce */
+        .ball-container.spinning { animation: spinCCW 1.5s linear infinite; }
+        @keyframes spinCCW { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
+
         .ball {
             position: absolute;
-            width: 14px; height: 14px;
-            background: white;
+            top: 25px; left: 50%; margin-left: -6px;
+            width: 12px; height: 12px;
+            background: #FFFFFF;
             border-radius: 50%;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
-            top: 50%; left: 50%;
-            /* Ball animation logic is handled in JS/Inline styles */
-            transition: all 0.1s;
+            box-shadow: 0 0 4px rgba(0,0,0,0.8);
         }
+        /* Ball Bounce Effect during spin */
+        .ball-container.spinning .ball { animation: bounce 0.3s ease-in-out infinite alternate; }
+        @keyframes bounce { from { top: 25px; } to { top: 20px; } }
 
         /* Center Hub */
         .wheel-center {
             position: absolute;
-            width: 140px; height: 140px;
+            width: 120px; height: 120px;
             background: #111827;
             border: 4px solid #FACC15;
             border-radius: 50%;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 10;
+            z-index: 20;
             box-shadow: 0 0 20px rgba(0,0,0,0.8);
         }
-        .result-number { font-size: 48px; font-weight: 900; color: white; line-height: 1; }
+        .result-number { font-size: 42px; font-weight: 900; color: white; line-height: 1; }
         .result-label { font-size: 10px; color: #FACC15; font-weight: 700; letter-spacing: 1px; margin-top: 4px; }
 
         /* CONTROLS */
@@ -221,11 +262,10 @@
         
         /* MODAL */
         .modal-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px; backdrop-filter: blur(5px); }
-        .modal-content { background: white; padding: 24px; border-radius: 24px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; max-height: 80vh; }
+        .modal-content { background: white; padding: 24px; border-radius: 24px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; max-height: 85vh; }
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         /* SETTINGS PAGE */
-        .settings-scroll { overflow-y: auto; flex: 1; padding-right: 4px; margin-top: 10px; }
         .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #E5E7EB; text-align: left; }
         .settings-label { font-weight: 600; font-size: 16px; color: #374151; }
         .toggle-switch { width: 50px; height: 28px; background: #E5E7EB; border-radius: 20px; position: relative; cursor: pointer; transition: 0.2s; }
@@ -233,11 +273,18 @@
         .toggle-circle { width: 24px; height: 24px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .toggle-switch.on .toggle-circle { left: 24px; }
         
+        /* HOW TO GRID */
+        .howto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .howto-item { background: #F9FAFB; padding: 16px 10px; border-radius: 16px; text-align: center; border: 1px solid #E5E7EB; display: flex; flex-direction: column; align-items: center; }
+        .howto-icon-box { background: #DCFCE7; color: #166534; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+        .howto-text { font-size: 12px; font-weight: 700; color: #4B5563; line-height: 1.3; }
+        .section-title { font-size: 12px; font-weight: 800; color: #9CA3AF; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; text-align: left; }
+
         /* CHALLENGE LIST VIEW */
         .challenge-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-        .tab-btn { flex: 1; padding: 8px; font-size: 11px; font-weight: 700; background: #F3F4F6; border: none; border-radius: 8px; cursor: pointer; color: #6B7280; }
+        .tab-btn { flex: 1; padding: 10px; font-size: 11px; font-weight: 700; background: #F3F4F6; border: none; border-radius: 8px; cursor: pointer; color: #6B7280; transition: 0.2s; }
         .tab-btn.active { background: var(--primary); color: white; }
-        .challenge-item { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #F3F4F6; text-align: left; font-size: 13px; color: #374151; }
+        .challenge-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #F3F4F6; text-align: left; font-size: 13px; color: #374151; }
         .challenge-num { width: 24px; height: 24px; background: #111827; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; margin-right: 12px; flex-shrink: 0; }
         .challenge-num.red { background: #DC2626; }
     </style>
@@ -270,7 +317,6 @@
         const { useState, useEffect, useRef } = React;
 
         // --- GAME DATA (12 Slots) ---
-        // Mapping numbers 1-12 to challenges for each zone
         const CHALLENGES = {
             TEE: [
                 "Driver off the Deck", "7-Iron Only", "Eyes Closed Swing", 
@@ -309,9 +355,35 @@
             );
         };
 
-        const SettingsModal = ({ isOpen, onClose, soundOn, toggleSound, installEvent, onInstall, onLogout }) => {
+        const ChallengesModal = ({ isOpen, onClose }) => {
             const [activeTab, setActiveTab] = useState('TEE');
-            
+            if (!isOpen) return null;
+            return (
+                 <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()}>
+                         <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10, borderBottom:'1px solid #E5E7EB', paddingBottom:10}}>
+                            <h2 style={{fontFamily:'var(--font-display)', fontSize:24, color:'#1F2937'}}>CHALLENGES</h2>
+                            <button onClick={onClose} style={{border:'none', background:'transparent'}}><i data-lucide="x" color="#9CA3AF"></i></button>
+                        </div>
+                        <div className="challenge-tabs">
+                            {['TEE', 'APPROACH', 'GREEN'].map(t => (
+                                <button key={t} className={`tab-btn ${activeTab === t ? 'active' : ''}`} onClick={() => setActiveTab(t)}>{t}</button>
+                            ))}
+                        </div>
+                        <div style={{flex: 1, overflowY:'auto', border:'1px solid #E5E7EB', borderRadius:12, padding:'0 12px'}}>
+                            {CHALLENGES[activeTab].map((c, i) => (
+                                <div key={i} className="challenge-item">
+                                    <div className={`challenge-num ${(i+1)%2 !== 0 ? 'red' : ''}`}>{i+1}</div>
+                                    {c}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                 </div>
+            );
+        };
+
+        const SettingsModal = ({ isOpen, onClose, soundOn, toggleSound, installEvent, onInstall, onLogout, onOpenChallenges }) => {
             if (!isOpen) return null;
             return (
                 <div className="modal-overlay" onClick={onClose}>
@@ -321,42 +393,41 @@
                             <button onClick={onClose} style={{border:'none', background:'transparent'}}><i data-lucide="x" color="#9CA3AF"></i></button>
                         </div>
                         
-                        <div className="settings-scroll">
-                            <div style={{fontSize:12, fontWeight:800, color:'#9CA3AF', marginBottom:8, letterSpacing:1}}>CHALLENGE LIST</div>
-                            <div className="challenge-tabs">
-                                {['TEE', 'APPROACH', 'GREEN'].map(t => (
-                                    <button key={t} className={`tab-btn ${activeTab === t ? 'active' : ''}`} onClick={() => setActiveTab(t)}>{t}</button>
-                                ))}
-                            </div>
-                            <div style={{height: 200, overflowY:'auto', border:'1px solid #E5E7EB', borderRadius:12, padding:'0 12px', marginBottom:20}}>
-                                {CHALLENGES[activeTab].map((c, i) => (
-                                    <div key={i} className="challenge-item">
-                                        <div className={`challenge-num ${(i+1)%2 !== 0 ? 'red' : ''}`}>{i+1}</div>
-                                        {c}
-                                    </div>
-                                ))}
+                        <div style={{flex:1, overflowY:'auto'}}>
+                            <div className="section-title">HOW IT WORKS</div>
+                            <div className="howto-grid">
+                                <div className="howto-item"><div className="howto-icon-box"><i data-lucide="users"></i></div><div className="howto-text">Host creates a room</div></div>
+                                <div className="howto-item"><div className="howto-icon-box"><i data-lucide="share"></i></div><div className="howto-text">Share the 4-letter code</div></div>
+                                <div className="howto-item"><div className="howto-icon-box"><i data-lucide="target"></i></div><div className="howto-text">Host picks the zone</div></div>
+                                <div className="howto-item"><div className="howto-icon-box"><i data-lucide="trophy"></i></div><div className="howto-text">Spin & win points</div></div>
                             </div>
 
-                            <div className="settings-row">
+                             <div className="settings-row">
                                 <span className="settings-label">Sound Effects</span>
                                 <div className={`toggle-switch ${soundOn ? 'on' : ''}`} onClick={toggleSound}>
                                     <div className="toggle-circle"></div>
                                 </div>
                             </div>
+                            
+                            <div style={{padding:'10px 0'}}>
+                                <button className="btn btn-outline" onClick={onOpenChallenges}>
+                                    <i data-lucide="list"></i> VIEW CHALLENGES
+                                </button>
+                            </div>
 
                             {installEvent && (
-                                <div style={{padding:'20px 0'}}>
+                                <div style={{padding:'10px 0'}}>
                                     <button className="btn btn-primary" onClick={onInstall}>
                                         <i data-lucide="download"></i> INSTALL APP
                                     </button>
                                 </div>
                             )}
+                        </div>
 
-                            <div style={{marginTop:20, paddingTop:20, borderTop:'1px solid #E5E7EB'}}>
-                                <button className="btn btn-danger" onClick={onLogout}>
-                                    <i data-lucide="log-out"></i> LOG OUT
-                                </button>
-                            </div>
+                        <div style={{marginTop:20, paddingTop:20, borderTop:'1px solid #E5E7EB'}}>
+                            <button className="btn btn-danger" onClick={onLogout}>
+                                <i data-lucide="log-out"></i> LOG OUT
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -364,30 +435,30 @@
         };
 
         const RouletteWheel = ({ isSpinning, resultNumber, zone }) => {
-            // Calculate ball position
-            // If spinning: orbit. If stopped: settle on number.
-            // Simplified visualization: 12 segments (30deg each).
-            // Number 1 is at top (0deg). 
+            // Logic: 12 segments (30 degrees each). 
+            // 1 at top (0deg), 2 at 30deg... 
+            // To land on 12, we rotate to -330 or 30.
+            // Rotation = - (Number - 1) * 30
             
-            const wheelRef = useRef(null);
-            
-            // Generate segments visual
             return (
                 <div className="wheel-stage">
+                    <div className="wheel-rim"></div>
+                    
                     <div className={`wheel-spinner ${isSpinning ? 'spinning' : ''}`} style={{
-                        transform: !isSpinning && resultNumber ? `rotate(-${(resultNumber - 1) * 30}deg)` : ''
+                        transform: !isSpinning && resultNumber ? `rotate(-${(resultNumber - 1) * 30}deg)` : 'rotate(0deg)'
                     }}>
-                        {/* Segments are drawn by conic gradient in CSS */}
+                        {[...Array(12)].map((_, i) => (
+                            <div key={i} className="wheel-number" style={{transform: `rotate(${i * 30}deg)`}}>
+                                {i + 1}
+                            </div>
+                        ))}
                     </div>
                     
-                    {/* The Ball */}
-                    <div className="ball-track" style={{
-                         animation: isSpinning ? 'spin 0.6s linear infinite reverse' : 'none',
+                    {/* Ball spins CCW. When stopped, it should be at Top (0deg) */}
+                    <div className={`ball-container ${isSpinning ? 'spinning' : ''}`} style={{
                          transform: !isSpinning ? 'rotate(0deg)' : ''
                     }}>
-                        <div className="ball" style={{
-                            top: -7, left: '50%', transform: 'translateX(-50%)' 
-                        }}></div>
+                        <div className="ball"></div>
                     </div>
 
                     <div className="wheel-center">
@@ -400,9 +471,6 @@
                             </>
                         )}
                     </div>
-                    
-                    {/* Pointer */}
-                    <div style={{position:'absolute', top:0, left:'50%', transform:'translateX(-50%)', width:0, height:0, borderLeft:'10px solid transparent', borderRight:'10px solid transparent', borderTop:'20px solid #FACC15', zIndex:20}}></div>
                 </div>
             );
         };
@@ -436,11 +504,10 @@
             const [isSpinning, setIsSpinning] = useState(false);
             const [modal, setModal] = useState({ open: false, title: "", message: "", type: "neutral" });
             const [showSettings, setShowSettings] = useState(false);
+            const [showChallenges, setShowChallenges] = useState(false); // New State
             const [soundOn, setSoundOn] = useState(true);
             const [installPrompt, setInstallPrompt] = useState(null);
-            
-            // Audio Refs
-            const spinSound = useRef(new Audio("https://cdn.freesound.org/previews/256/256113_3263906-lq.mp3")); // Ticking
+            const spinSound = useRef(new Audio("https://cdn.freesound.org/previews/256/256113_3263906-lq.mp3"));
 
             useEffect(() => {
                 const unsub = window.ops.onAuthStateChanged(window.auth, (u) => {
@@ -454,16 +521,13 @@
                 return () => unsub();
             }, []);
 
-            // GAME LOOP
             useEffect(() => {
                 if (!gameCode) return;
                 let interval;
-                
                 const unsub = window.ops.onSnapshot(window.ops.doc(window.db, "games", gameCode), (doc) => {
                     if (doc.exists()) {
                         const data = doc.data();
                         setGameData(data);
-                        
                         if (data.isSpinning) {
                             setIsSpinning(true);
                             if(!interval && soundOn) {
@@ -480,19 +544,12 @@
                         }
                     }
                 });
-                return () => {
-                    unsub();
-                    if(interval) clearInterval(interval);
-                };
+                return () => { unsub(); if(interval) clearInterval(interval); };
             }, [gameCode, soundOn]);
 
-            useEffect(() => { lucide.createIcons(); }, [user, gameData, loading, showSettings]);
+            useEffect(() => { lucide.createIcons(); }, [user, gameData, loading, showSettings, showChallenges]);
 
-            // ACTIONS
-            const handleInstall = () => {
-                if(!installPrompt) return;
-                installPrompt.prompt();
-            };
+            const handleInstall = () => { if(installPrompt) installPrompt.prompt(); };
             const handleLogout = async () => { setShowSettings(false); await window.ops.signOut(window.auth); setGameCode(""); setGameData(null); };
             const handleLogin = async () => { await window.ops.signInWithPopup(window.auth, window.provider); };
             const createGame = async () => {
@@ -500,10 +557,7 @@
                 await window.ops.setDoc(window.ops.doc(window.db, "games", code), {
                     host: user.uid,
                     players: [{ uid: user.uid, name: user.displayName.split(" ")[0], photo: user.photoURL, score: 0 }],
-                    lastNumber: null,
-                    isSpinning: false,
-                    zone: "TEE",
-                    createdAt: new Date()
+                    lastNumber: null, isSpinning: false, zone: "TEE", createdAt: new Date()
                 });
                 setGameCode(code);
             };
@@ -528,13 +582,10 @@
                 try {
                     await window.ops.updateDoc(ref, { isSpinning: true, zone: zone });
                     setTimeout(async () => {
-                        // Pick number 1-12
                         const result = Math.floor(Math.random() * 12) + 1;
                         await window.ops.updateDoc(ref, { isSpinning: false, lastNumber: result });
                     }, 3000); 
-                } catch (error) {
-                    await window.ops.updateDoc(ref, { isSpinning: false });
-                }
+                } catch (error) { await window.ops.updateDoc(ref, { isSpinning: false }); }
             };
             const addPoint = async (uid) => {
                 const ref = window.ops.doc(window.db, "games", gameCode);
@@ -542,16 +593,12 @@
                 const newPlayers = snap.data().players.map(p => { if (p.uid === uid) return { ...p, score: p.score + 1 }; return p; });
                 await window.ops.updateDoc(ref, { players: newPlayers });
             };
-
-            // Helpers to get challenge text
             const getChallengeText = () => {
                 if(!currentNumber) return "PRESS SPIN";
                 const z = gameData?.zone || "TEE";
-                const index = currentNumber - 1; 
-                return CHALLENGES[z][index] || "Unknown";
+                return CHALLENGES[z][currentNumber - 1] || "Unknown";
             };
 
-            // RENDER
             if (loading) return <div className="app-container" style={{justifyContent:'center', alignItems:'center', color:'white'}}>Loading...</div>;
 
             if (!user) return (
@@ -569,14 +616,14 @@
 
             const Header = () => (
                 <div className="header">
+                    {gameCode && (
+                        <div className="header-left">
+                            <div className="room-label">ROOM</div>
+                            <div className="room-code">{gameCode}</div>
+                        </div>
+                    )}
                     <img src="./images/logo512.png" className="header-logo" />
-                    <div style={{position:'absolute', right:20}}>
-                        {gameCode && (
-                            <div style={{position:'absolute', right:60, top:8, textAlign:'right', color:'#1F2937'}}>
-                                <div style={{fontSize:9, fontWeight:800, opacity:0.5}}>ROOM</div>
-                                <div style={{fontFamily:'var(--font-display)', fontSize:24, letterSpacing:1}}>{gameCode}</div>
-                            </div>
-                        )}
+                    <div className="header-right">
                         <button className="header-btn" onClick={() => setShowSettings(true)}>
                             <i data-lucide="settings" size="24"></i>
                         </button>
@@ -587,7 +634,19 @@
             return (
                 <div className="app-container">
                     <Modal isOpen={modal.open} title={modal.title} message={modal.message} type={modal.type} onClose={() => setModal({...modal, open: false})} />
-                    <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} soundOn={soundOn} toggleSound={() => setSoundOn(!soundOn)} installEvent={installPrompt} onInstall={handleInstall} onLogout={handleLogout} />
+                    
+                    <SettingsModal 
+                        isOpen={showSettings} 
+                        onClose={() => setShowSettings(false)} 
+                        soundOn={soundOn} 
+                        toggleSound={() => setSoundOn(!soundOn)} 
+                        installEvent={installPrompt} 
+                        onInstall={handleInstall} 
+                        onLogout={handleLogout}
+                        onOpenChallenges={() => setShowChallenges(true)}
+                    />
+                    
+                    <ChallengesModal isOpen={showChallenges} onClose={() => setShowChallenges(false)} />
 
                     <Header />
 
@@ -616,7 +675,6 @@
                         <div className="game-content">
                             <RouletteWheel isSpinning={isSpinning} resultNumber={currentNumber} zone={gameData?.zone || 'TEE'} />
                             
-                            {/* CHALLENGE DISPLAY CARD */}
                             {!isSpinning && currentNumber && (
                                 <div className="card" style={{textAlign:'center', background:'#1F2937', color:'#FACC15', padding:16, border:'2px solid #FACC15'}}>
                                     <div style={{fontSize:10, color:'white', opacity:0.7, fontWeight:700, letterSpacing:2}}>CHALLENGE #{currentNumber}</div>
