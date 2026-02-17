@@ -39,7 +39,6 @@
             scrollbar-gutter: stable; 
         }
         
-        /* APP CONTAINER */
         .app-container { 
             width: 100%;
             max-width: 450px; 
@@ -47,7 +46,7 @@
             display: flex; 
             flex-direction: column; 
             position: relative;
-            background: #F3F4F6; /* Light grey background for the "app" feel */
+            background: #F3F4F6;
             margin: 0 auto;
         }
         @media (min-width: 500px) {
@@ -59,7 +58,6 @@
             }
         }
 
-        /* HEADER - Full Width Edge-to-Edge */
         .header { 
             background: #FFFFFF; 
             min-height: 80px;
@@ -100,44 +98,44 @@
         }
         .header-btn:active { color: var(--primary); transform: scale(0.95); }
 
-        /* CONTENT AREA - Vertically Centered Focus */
         .game-content { 
             flex: 1; 
             overflow-y: auto; 
             padding: 20px; 
             display: flex; 
             flex-direction: column; 
-            align-items: center; /* Center Horizontally */
-            justify-content: center; /* Center Vertically */
+            align-items: center;
+            justify-content: center;
             width: 100%;
             position: relative;
         }
         
-        /* CARD - Full Width Style */
+        /* CARD - FIXED HEIGHT UPDATE */
         .card { 
             background: #FFFFFF; 
             width: 100%;
+            height: 320px; /* Forces the box to stay exactly this size */
             border-radius: 20px; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
-            animation: slideUp 0.3s ease-out;
             position: relative; 
             overflow: hidden;
             display: flex;
             flex-direction: column;
             border: 1px solid #E5E7EB;
+            flex-shrink: 0; /* Prevents shrinking on smaller screens */
         }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         .card-inner {
             padding: 24px;
             width: 100%;
+            height: 100%; /* Fills the fixed 320px card */
             display: flex;
             flex-direction: column;
             align-items: stretch;
             text-align: center;
+            justify-content: center; /* Vertically centers the content */
         }
 
-        /* BUTTONS */
         .btn { 
             border: none; padding: 18px; border-radius: 14px; 
             font-weight: 800; font-size: 16px; width: 100%; cursor: pointer; 
@@ -152,7 +150,6 @@
         .btn-outline { background: white; border: 2px solid #E5E7EB; color: #374151; box-shadow: 0 4px 0 #E5E7EB; }
         .btn-danger { background: #fee2e2; color: #dc2626; font-weight: 700; box-shadow: none; }
         
-        /* WHEEL STYLES */
         .wheel-container-wrapper {
             position: relative; display: flex; justify-content: center; margin-bottom: 30px; 
             flex-shrink: 0; 
@@ -187,7 +184,6 @@
         .wheel-spinner.spinning { animation: spinCW 0.6s linear infinite; }
         @keyframes spinCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* NUMBERS */
         .wheel-number {
             position: absolute; top: 50%; left: 50%;
             font-family: var(--font-display); color: white; font-size: 16px; width: 20px; height: 20px; line-height: 20px; text-align: center;
@@ -210,7 +206,6 @@
         .result-number { font-size: 38px; font-weight: 900; color: white; line-height: 1; }
         .result-label { font-size: 9px; color: #FACC15; font-weight: 700; letter-spacing: 1px; margin-top: 4px; }
 
-        /* RESULT BOX */
         .result-box {
             background: #F3F4F6;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -219,6 +214,7 @@
             border-radius: 16px;
             animation: fadeIn 0.2s ease;
             width: 100%;
+            height: 100%; /* Fill the fixed card container */
         }
         .result-badge {
             background: #DC2626; color: white;
@@ -228,27 +224,26 @@
             border: 4px solid #1F2937;
             margin-bottom: 16px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            flex-shrink: 0;
         }
         .result-text { 
             color: #1F2937; font-family: var(--font-display); 
-            font-size: 28px; line-height: 1.1; margin-bottom: 24px; 
+            font-size: 26px; line-height: 1.1; margin-bottom: 24px; 
             text-transform: uppercase;
+            flex: 1; display: flex; align-items: center; justify-content: center;
         }
 
-        /* CONTROLS */
-        .zone-selector { display: flex; gap: 4px; margin-bottom: 16px; background: #E5E7EB; padding: 4px; border-radius: 14px; }
+        .zone-selector { display: flex; gap: 4px; margin-bottom: 16px; background: #E5E7EB; padding: 4px; border-radius: 14px; width: 100%; }
         .zone-btn { flex: 1; padding: 12px 0; border-radius: 10px; border: none; background: transparent; color: #6B7280; font-weight: 700; font-size: 11px; cursor: pointer; transition: all 0.2s; }
         .zone-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
         .input-lg { font-size: 24px; padding: 16px; text-align: center; border: 2px solid #E5E7EB; border-radius: 12px; width: 100%; outline: none; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; background: #F9FAFB; }
         .input-lg:focus { border-color: var(--primary); background: white; }
 
-        /* MODAL */
         .modal-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 90; padding: 20px; backdrop-filter: blur(5px); }
         .modal-content { background: white; padding: 24px; border-radius: 24px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; max-height: 85vh; }
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
-        /* SETTINGS ROWS */
         .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #E5E7EB; text-align: left; }
         .toggle-switch { width: 50px; height: 28px; background: #E5E7EB; border-radius: 20px; position: relative; cursor: pointer; transition: 0.2s; }
         .toggle-switch.on { background: var(--primary-light); }
@@ -289,7 +284,6 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // --- GAME DATA (12 Slots) ---
         const CHALLENGES = {
             TEE: [
                 "Driver off the Deck", "7-Iron Only", "Eyes Closed Swing", 
@@ -311,7 +305,6 @@
             ]
         };
 
-        // --- COMPONENTS ---
         const Modal = ({ isOpen, title, message, onClose, type = 'neutral' }) => {
             if (!isOpen) return null;
             return (
@@ -404,7 +397,6 @@
                 <div className="wheel-container-wrapper">
                     <div className="wheel-stage">
                         <div className="wheel-rim"></div>
-                        
                         <div className={`wheel-spinner ${isSpinning ? 'spinning' : ''}`} style={{
                             transform: !isSpinning && resultNumber ? `rotate(-${(resultNumber - 1) * 30 + 15}deg)` : 'rotate(0deg)'
                         }}>
@@ -416,11 +408,9 @@
                                 </div>
                             ))}
                         </div>
-                        
                         <div className={`ball-container ${isSpinning ? 'spinning' : ''}`}>
                             <div className="ball"></div>
                         </div>
-
                         <div className="wheel-center">
                             {isSpinning ? (
                                  <div style={{fontSize:10, color:'#FACC15', fontWeight:800}}>SPINNING</div>
@@ -551,8 +541,8 @@
             if (!user) return (
                 <div className="app-container">
                     <div className="game-content" style={{justifyContent:'center', alignItems:'center'}}>
-                         <div className="card">
-                            <div className="card-inner">
+                         <div className="card" style={{height:'auto'}}>
+                            <div className="card-inner" style={{height:'auto', padding:'40px 24px'}}>
                                 <img src="./images/logo512.png" style={{width:80, height:80, margin:'0 auto 20px'}} />
                                 <h1 style={{fontFamily:'var(--font-display)', fontSize:36, lineHeight:1, marginBottom:16, color:'var(--primary)'}}>CADDIE ROULETTE</h1>
                                 <h3 style={{fontSize:18, fontWeight:700, marginBottom:10, color:'#1F2937'}}>Your 15th Club.</h3>
@@ -583,8 +573,8 @@
                     <Header />
 
                     <div className="game-content">
-                         <div className="card">
-                            <div className="card-inner">
+                         <div className="card" style={{height:'auto'}}>
+                            <div className="card-inner" style={{height:'auto', padding:'40px 24px'}}>
                                 <h2 style={{fontSize:20, fontWeight:800, color:'#374151', marginBottom:20}}>NEW ROUND?</h2>
                                 <button className="btn btn-primary" onClick={createGame} style={{marginBottom:30}}>CREATE ROOM</button>
                                 
@@ -632,17 +622,19 @@
                                     <div className="result-box">
                                             <div className="result-badge">{currentNumber}</div>
                                             <div className="result-text">{CHALLENGES[gameData.zone][currentNumber - 1]}</div>
-                                            <button className="btn btn-primary" onClick={() => setCurrentNumber(null)} style={{width:'100%'}}>OK</button>
+                                            <button className="btn btn-primary" onClick={() => setCurrentNumber(null)} style={{width:'100%', marginTop:'auto'}}>OK</button>
                                     </div>
                                 ) : (
                                     (gameData && gameData.host === user.uid) ? (
                                         <>
-                                            <div className="zone-selector">
-                                                {['TEE', 'APPROACH', 'GREEN'].map(z => (
-                                                    <button key={z} className={`zone-btn ${zone === z ? 'active' : ''}`} onClick={() => setZone(z)}>{z}</button>
-                                                ))}
+                                            <div style={{flex:1, display:'flex', alignItems:'center', width:'100%'}}>
+                                                <div className="zone-selector">
+                                                    {['TEE', 'APPROACH', 'GREEN'].map(z => (
+                                                        <button key={z} className={`zone-btn ${zone === z ? 'active' : ''}`} onClick={() => setZone(z)}>{z}</button>
+                                                    ))}
+                                                </div>
                                             </div>
-                                            <button className="btn btn-accent" onClick={handleSpin} disabled={isSpinning} style={{fontSize:20, padding:20, opacity: isSpinning ? 0.6 : 1}}>
+                                            <button className="btn btn-accent" onClick={handleSpin} disabled={isSpinning} style={{fontSize:20, padding:20, opacity: isSpinning ? 0.6 : 1, marginTop:'auto'}}>
                                                 {isSpinning ? 'SPINNING...' : 'SPIN THE WHEEL'}
                                             </button>
                                         </>
