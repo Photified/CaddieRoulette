@@ -49,12 +49,8 @@
             border: none !important;
         }
 
-        /* Desktop Constraint: Only constrains width, DOES NOT ADD VISUAL BOX */
         @media (min-width: 500px) {
-            .app-container {
-                max-width: 450px; 
-                margin: 0 auto;
-            }
+            .app-container { max-width: 450px; margin: 0 auto; }
         }
 
         /* HEADER */
@@ -74,7 +70,7 @@
         .header-btn { background: transparent; border: none; cursor: pointer; color: #9CA3AF; padding: 8px; }
         .room-code { position: absolute; left: 20px; font-family: var(--font-display); font-size: 20px; color: #9CA3AF; letter-spacing: 1px; }
 
-        /* MAIN LAYOUT */
+        /* LAYOUT */
         .game-content { 
             flex: 1; 
             display: flex; 
@@ -84,7 +80,6 @@
             overflow: hidden;
         }
 
-        /* TOP SECTION: WHEEL */
         .top-section {
             height: 55%; 
             display: flex; 
@@ -95,7 +90,6 @@
             overflow: visible; 
         }
 
-        /* BOTTOM SECTION: CONTROLS */
         .bottom-section {
             height: 45%; 
             width: 100%;
@@ -107,7 +101,62 @@
             background: #FFFFFF;
         }
 
-        /* COMPONENTS */
+        /* WHEEL COMPONENT */
+        .wheel-stage {
+            position: relative; width: 280px; height: 280px; border-radius: 50%;
+            background: #111827; 
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+            border: 4px solid #111827; 
+        }
+        
+        .wheel-rim { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 12px solid #281D11; pointer-events: none; z-index: 20; }
+        
+        .wheel-spinner {
+            width: 94%; height: 94%; border-radius: 50%; position: relative;
+            background: conic-gradient(
+                #DC2626 0deg 30deg, #1F2937 30deg 60deg, #DC2626 60deg 90deg, #1F2937 90deg 120deg, 
+                #DC2626 120deg 150deg, #1F2937 150deg 180deg, #DC2626 180deg 210deg, #1F2937 210deg 240deg, 
+                #DC2626 240deg 270deg, #1F2937 270deg 300deg, #DC2626 300deg 330deg, #1F2937 330deg 360deg
+            );
+            /* Transition handles the spin smoothing now */
+            transition: transform 3.5s cubic-bezier(0.2, 0.8, 0.1, 1); 
+            z-index: 5;
+        }
+        
+        .wheel-number {
+            position: absolute; top: 50%; left: 50%;
+            font-family: var(--font-display); color: white; font-size: 16px; 
+            width: 20px; height: 20px; line-height: 20px; text-align: center;
+            margin-top: -10px; margin-left: -10px; 
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            z-index: 10;
+        }
+
+        /* BALL PHYSICS */
+        .ball-container { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            pointer-events: none; 
+            z-index: 50; /* Topmost layer */
+            transition: transform 3.5s cubic-bezier(0.2, 0.8, 0.1, 1);
+        }
+
+        .ball { 
+            position: absolute; top: 18px; left: 50%; margin-left: -7px; 
+            width: 14px; height: 14px; 
+            background: white; border-radius: 50%; 
+            border: 2px solid rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+        }
+
+        .wheel-center {
+            position: absolute; width: 100px; height: 100px; background: #111827; border: 4px solid #FACC15;
+            border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 30;
+        }
+        .result-number-center { font-size: 38px; font-weight: 900; color: white; line-height: 1; }
+        .result-label-center { font-size: 10px; color: #FACC15; font-weight: 700; letter-spacing: 1px; margin-top: 4px; }
+
+        /* UI ELEMENTS */
         .btn { 
             border: none; padding: 22px 0; border-radius: 16px; 
             font-weight: 800; font-size: 18px; width: 100%; cursor: pointer; 
@@ -119,58 +168,10 @@
         .btn-primary { background: var(--primary); color: white; }
         .btn-accent { background: var(--accent); color: #422006; }
         
-        /* WHEEL */
-        .wheel-stage {
-            position: relative; width: 280px; height: 280px; border-radius: 50%;
-            background: #111827; 
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
-            box-shadow: none; 
-            border: 4px solid #111827; 
-        }
-        .wheel-rim { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 12px solid #281D11; pointer-events: none; z-index: 20; }
-        .wheel-spinner {
-            width: 94%; height: 94%; border-radius: 50%; position: relative;
-            background: conic-gradient(
-                #DC2626 0deg 30deg, #1F2937 30deg 60deg, #DC2626 60deg 90deg, #1F2937 90deg 120deg, 
-                #DC2626 120deg 150deg, #1F2937 150deg 180deg, #DC2626 180deg 210deg, #1F2937 210deg 240deg, 
-                #DC2626 240deg 270deg, #1F2937 270deg 300deg, #DC2626 300deg 330deg, #1F2937 330deg 360deg
-            );
-            transition: transform 3s cubic-bezier(0.2, 0.8, 0.1, 1); 
-        }
-        
-        /* RESTORED: Wheel Numbers */
-        .wheel-number {
-            position: absolute; top: 50%; left: 50%;
-            font-family: var(--font-display); color: white; font-size: 16px; 
-            width: 20px; height: 20px; line-height: 20px; text-align: center;
-            margin-top: -10px; margin-left: -10px; 
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-            z-index: 10;
-        }
-
-        .wheel-center {
-            position: absolute; width: 100px; height: 100px; background: #111827; border: 4px solid #FACC15;
-            border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 30;
-        }
-        .result-number-center { font-size: 38px; font-weight: 900; color: white; line-height: 1; }
-        .result-label-center { font-size: 10px; color: #FACC15; font-weight: 700; letter-spacing: 1px; margin-top: 4px; }
-        
-        /* RESTORED: Ball Visibility */
-        .ball { 
-            position: absolute; top: 18px; left: 50%; margin-left: -6px; width: 12px; height: 12px; 
-            background: white; border-radius: 50%; 
-            box-shadow: 0 0 4px rgba(0,0,0,0.8); 
-            z-index: 35;
-        }
-        .ball-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 25; }
-
-        /* ZONE SELECTOR */
         .zone-selector { display: flex; gap: 0; margin-bottom: 30px; background: #F3F4F6; padding: 4px; border-radius: 14px; width: 100%; }
         .zone-btn { flex: 1; padding: 14px 0; border-radius: 12px; border: none; background: transparent; color: #9CA3AF; font-weight: 800; font-size: 11px; cursor: pointer; letter-spacing: 1px; }
         .zone-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
 
-        /* RESULT DISPLAY */
         .result-container { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: popIn 0.2s; }
         @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
@@ -188,7 +189,6 @@
         .input-lg { font-size: 24px; padding: 20px; text-align: center; border: 2px solid #E5E7EB; border-radius: 16px; width: 100%; outline: none; font-weight: 800; letter-spacing: 4px; text-transform: uppercase; background: #F9FAFB; margin-bottom: 20px; }
         .input-lg:focus { border-color: var(--primary); background: white; }
 
-        /* MODAL */
         .modal-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
         .modal-content { background: white; width: 100%; max-width: 400px; text-align: center; display: flex; flex-direction: column; }
         
@@ -286,13 +286,21 @@
             );
         };
 
-        const RouletteWheel = ({ isSpinning, resultNumber, zone }) => {
+        const RouletteWheel = ({ isSpinning, resultNumber, zone, wheelRotation }) => {
+            // Calculate where the ball needs to be to match the number
+            // The number 'i' is at: i * 30 + 15 degrees inside the wheel
+            // The wheel is rotated by: wheelRotation
+            // So visual angle of number is: wheelRotation + (numberAngle)
+            // We want ball to match that visual angle.
+            const targetBallRotation = resultNumber 
+                ? wheelRotation + ((resultNumber - 1) * 30 + 15) 
+                : 0;
+
             return (
                 <div className="wheel-stage">
                     <div className="wheel-rim"></div>
                     <div className="wheel-spinner" style={{
-                        transform: !isSpinning && resultNumber ? `rotate(-${(resultNumber - 1) * 30 + 15}deg)` : (isSpinning ? '' : 'rotate(0deg)'),
-                        animation: isSpinning ? 'spinCW 0.6s linear infinite' : 'none'
+                        transform: `rotate(${wheelRotation}deg)`
                     }}>
                         {[...Array(12)].map((_, i) => (
                             <div key={i} className="wheel-number" style={{
@@ -300,7 +308,10 @@
                             }}>{i + 1}</div>
                         ))}
                     </div>
-                    <div className="ball-container" style={{ animation: isSpinning ? 'spinCCW 1.5s linear infinite' : 'none' }}>
+                    {/* The ball rotates to match the target number's final position */}
+                    <div className="ball-container" style={{
+                        transform: `rotate(${targetBallRotation}deg)`
+                    }}>
                         <div className="ball"></div>
                     </div>
                     <div className="wheel-center">
@@ -328,6 +339,10 @@
             const [modal, setModal] = useState({ open: false, title: "", message: "" });
             const [showSettings, setShowSettings] = useState(false);
             const [soundOn, setSoundOn] = useState(true);
+            
+            // New state to track total rotation so it always spins forward
+            const [wheelRotation, setWheelRotation] = useState(0);
+            
             const spinSound = useRef(new Audio("https://cdn.freesound.org/previews/256/256113_3263906-lq.mp3"));
 
             useEffect(() => {
@@ -345,8 +360,14 @@
                     if (doc.exists()) {
                         const data = doc.data();
                         setGameData(data);
+                        
+                        // Handle Spin State
                         if (data.isSpinning) {
                             setIsSpinning(true);
+                            // If we just started spinning, add a "spinning" rotation (visual only)
+                            // We keep adding rotation so it looks continuous until result arrives
+                            setWheelRotation(prev => prev + 720); 
+                            
                             if(!interval && soundOn) {
                                 interval = setInterval(() => {
                                     spinSound.current.currentTime = 0;
@@ -357,12 +378,21 @@
                         } else {
                             setIsSpinning(false);
                             if(interval) clearInterval(interval);
-                            if(data.lastNumber) setCurrentNumber(data.lastNumber);
+                            
+                            // If we have a new number, LAND the wheel
+                            if(data.lastNumber && data.lastNumber !== currentNumber) {
+                                setCurrentNumber(data.lastNumber);
+                                // RANDOM LANDING LOGIC:
+                                // Add 1080 (3 spins) + Random (0-360)
+                                // This ensures the wheel stops at a random angle
+                                const randomStop = Math.floor(Math.random() * 360);
+                                setWheelRotation(prev => prev + 1080 + randomStop);
+                            }
                         }
                     }
                 });
                 return () => { unsub(); if(interval) clearInterval(interval); };
-            }, [gameCode, soundOn]);
+            }, [gameCode, soundOn, currentNumber]);
 
             useEffect(() => { if(window.lucide) window.lucide.createIcons(); });
 
@@ -460,7 +490,12 @@
                     <Header />
                     <div className="game-content">
                         <div className="top-section">
-                             <RouletteWheel isSpinning={isSpinning} resultNumber={currentNumber} zone={gameData?.zone || 'TEE'} />
+                             <RouletteWheel 
+                                isSpinning={isSpinning} 
+                                resultNumber={currentNumber} 
+                                zone={gameData?.zone || 'TEE'}
+                                wheelRotation={wheelRotation}
+                             />
                         </div>
                         
                         <div className="bottom-section">
