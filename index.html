@@ -42,9 +42,9 @@
         /* LAYOUT - MOBILE FRAME CENTERED */
         .app-container { 
             width: 100%;
-            max-width: 450px; /* Mobile width constraint */
+            max-width: 450px; 
             height: 100%;
-            max-height: 850px; /* Desktop height constraint */
+            max-height: 850px; 
             display: flex; 
             flex-direction: column; 
             position: relative;
@@ -66,7 +66,7 @@
             height: 90px;
             display: flex; 
             align-items: center; 
-            justify-content: center; /* Center Logo */
+            justify-content: center; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
             z-index: 20; 
             position: relative;
@@ -78,7 +78,7 @@
         
         .header-logo { 
             height: 70px; width: 70px; 
-            /* NO DROP SHADOW as requested */
+            /* NO DROP SHADOW */
             transition: transform 0.2s;
         }
         
@@ -86,6 +86,8 @@
         .header-left {
             position: absolute;
             left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
             display: flex; flex-direction: column; align-items: flex-start;
         }
         .room-label { font-size: 9px; font-weight: 800; color: #9CA3AF; letter-spacing: 1px; text-transform: uppercase; }
@@ -95,6 +97,8 @@
         .header-right {
             position: absolute;
             right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
         }
         .header-btn { 
             background: #F3F4F6; border: none; color: var(--primary); 
@@ -154,37 +158,34 @@
         .btn-danger { background: #fee2e2; color: #dc2626; font-weight: 700; box-shadow: none; }
         .btn-outline { background: white; border: 2px solid #E5E7EB; color: #374151; box-shadow: 0 4px 0 #E5E7EB; }
         
-        /* === NEW ROULETTE WHEEL === */
+        /* === ROULETTE WHEEL === */
         .wheel-stage {
             position: relative;
             width: 300px; height: 300px;
             margin: 0 auto 20px auto;
             border-radius: 50%;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            /* Wood Rim Texture */
             background: radial-gradient(circle, transparent 60%, #3e2723 61%, #5d4037 100%);
             overflow: hidden;
             display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; /* PREVENTS OVAL SQUISHING */
         }
         
-        /* Metallic Inner Rim */
         .wheel-rim {
             position: absolute;
             width: 270px; height: 270px;
             border-radius: 50%;
-            border: 8px solid #B45309; /* Bronze */
+            border: 8px solid #B45309; 
             box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
             z-index: 5;
             pointer-events: none;
         }
 
-        /* The Numbers Ring */
         .wheel-spinner {
             width: 270px; height: 270px;
             border-radius: 50%;
             position: relative;
-            transition: transform 3s cubic-bezier(0.2, 0.8, 0.1, 1); /* Spindown ease */
-            /* 12 Segments Conic Gradient */
+            transition: transform 3s cubic-bezier(0.2, 0.8, 0.1, 1); 
             background: conic-gradient(
                 #DC2626 0deg 30deg, #1F2937 30deg 60deg, 
                 #DC2626 60deg 90deg, #1F2937 90deg 120deg, 
@@ -196,15 +197,15 @@
             transform: rotate(0deg);
         }
         
-        /* Animation: Wheel spins Clockwise */
-        .wheel-spinner.spinning { animation: spinCW 2s linear infinite; }
+        /* Infinite Spin Animation */
+        .wheel-spinner.spinning { animation: spinCW 0.6s linear infinite; }
         @keyframes spinCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Numbers Overlay (positioned absolute on spinner) */
+        /* Numbers Overlay */
         .wheel-number {
             position: absolute;
             top: 10px; left: 50%;
-            transform-origin: 0 125px; /* Radius of spinner - padding */
+            transform-origin: 0 125px; 
             font-family: var(--font-display);
             color: white;
             font-size: 18px;
@@ -213,7 +214,7 @@
             text-shadow: 0 1px 2px black;
         }
 
-        /* The Ball Container (Rotates Counter-Clockwise) */
+        /* Ball Container (Rotates CCW) */
         .ball-container {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -221,7 +222,6 @@
             z-index: 10;
         }
         
-        /* Ball Animation: Spin CCW + Bounce */
         .ball-container.spinning { animation: spinCCW 1.5s linear infinite; }
         @keyframes spinCCW { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
 
@@ -233,11 +233,9 @@
             border-radius: 50%;
             box-shadow: 0 0 4px rgba(0,0,0,0.8);
         }
-        /* Ball Bounce Effect during spin */
         .ball-container.spinning .ball { animation: bounce 0.3s ease-in-out infinite alternate; }
         @keyframes bounce { from { top: 25px; } to { top: 20px; } }
 
-        /* Center Hub */
         .wheel-center {
             position: absolute;
             width: 120px; height: 120px;
@@ -437,8 +435,8 @@
         const RouletteWheel = ({ isSpinning, resultNumber, zone }) => {
             // Logic: 12 segments (30 degrees each). 
             // 1 at top (0deg), 2 at 30deg... 
-            // To land on 12, we rotate to -330 or 30.
-            // Rotation = - (Number - 1) * 30
+            // To land on a number at the top, we need to rotate NEGATIVE.
+            // Formula: Rotation = -(resultNumber - 1) * 30
             
             return (
                 <div className="wheel-stage">
