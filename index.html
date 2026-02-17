@@ -101,7 +101,7 @@
             background: #FFFFFF;
         }
 
-        /* WHEEL COMPONENT */
+        /* WHEEL COMPONENT - RESTORED FROM OLDINDEX */
         .wheel-stage {
             position: relative; width: 280px; height: 280px; border-radius: 50%;
             background: #111827; 
@@ -118,11 +118,13 @@
                 #DC2626 120deg 150deg, #1F2937 150deg 180deg, #DC2626 180deg 210deg, #1F2937 210deg 240deg, 
                 #DC2626 240deg 270deg, #1F2937 270deg 300deg, #DC2626 300deg 330deg, #1F2937 330deg 360deg
             );
-            /* Transition handles the spin smoothing now */
-            transition: transform 3.5s cubic-bezier(0.2, 0.8, 0.1, 1); 
-            z-index: 5;
+            transition: transform 3s cubic-bezier(0.2, 0.8, 0.1, 1); 
+            transform: rotate(0deg);
         }
-        
+        .wheel-spinner.spinning { animation: spinCW 0.6s linear infinite; }
+        @keyframes spinCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* NUMBERS - RESTORED */
         .wheel-number {
             position: absolute; top: 50%; left: 50%;
             font-family: var(--font-display); color: white; font-size: 16px; 
@@ -132,20 +134,21 @@
             z-index: 10;
         }
 
-        /* BALL PHYSICS */
+        /* BALL PHYSICS - RESTORED */
         .ball-container { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             pointer-events: none; 
-            z-index: 50; /* Topmost layer */
-            transition: transform 3.5s cubic-bezier(0.2, 0.8, 0.1, 1);
+            z-index: 50; 
         }
+        /* Ball bounces when spinning, does NOT rotate around clock */
+        .ball-container.spinning .ball { animation: bounce 0.3s ease-in-out infinite alternate; }
+        @keyframes bounce { from { top: 22px; } to { top: 18px; } }
 
         .ball { 
-            position: absolute; top: 18px; left: 50%; margin-left: -7px; 
-            width: 14px; height: 14px; 
+            position: absolute; top: 20px; left: 50%; margin-left: -6px; 
+            width: 12px; height: 12px; 
             background: white; border-radius: 50%; 
-            border: 2px solid rgba(0,0,0,0.1);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+            box-shadow: 0 0 4px rgba(0,0,0,0.5); 
         }
 
         .wheel-center {
@@ -286,34 +289,28 @@
             );
         };
 
-        const RouletteWheel = ({ isSpinning, resultNumber, zone, wheelRotation }) => {
-            // Calculate where the ball needs to be to match the number
-            // The number 'i' is at: i * 30 + 15 degrees inside the wheel
-            // The wheel is rotated by: wheelRotation
-            // So visual angle of number is: wheelRotation + (numberAngle)
-            // We want ball to match that visual angle.
-            const targetBallRotation = resultNumber 
-                ? wheelRotation + ((resultNumber - 1) * 30 + 15) 
-                : 0;
-
+        // RESTORED WHEEL COMPONENT FROM OLDINDEX
+        const RouletteWheel = ({ isSpinning, resultNumber, zone }) => {
             return (
                 <div className="wheel-stage">
                     <div className="wheel-rim"></div>
-                    <div className="wheel-spinner" style={{
-                        transform: `rotate(${wheelRotation}deg)`
+                    
+                    <div className={`wheel-spinner ${isSpinning ? 'spinning' : ''}`} style={{
+                        transform: !isSpinning && resultNumber ? `rotate(-${(resultNumber - 1) * 30 + 15}deg)` : 'rotate(0deg)'
                     }}>
                         {[...Array(12)].map((_, i) => (
                             <div key={i} className="wheel-number" style={{
                                 transform: `rotate(${i * 30 + 15}deg) translate(0, -100px)`
-                            }}>{i + 1}</div>
+                            }}>
+                                {i + 1}
+                            </div>
                         ))}
                     </div>
-                    {/* The ball rotates to match the target number's final position */}
-                    <div className="ball-container" style={{
-                        transform: `rotate(${targetBallRotation}deg)`
-                    }}>
+                    
+                    <div className={`ball-container ${isSpinning ? 'spinning' : ''}`}>
                         <div className="ball"></div>
                     </div>
+
                     <div className="wheel-center">
                         {isSpinning ? (
                                 <div style={{fontSize:10, color:'#FACC15', fontWeight:800}}>SPINNING</div>
@@ -339,10 +336,6 @@
             const [modal, setModal] = useState({ open: false, title: "", message: "" });
             const [showSettings, setShowSettings] = useState(false);
             const [soundOn, setSoundOn] = useState(true);
-            
-            // New state to track total rotation so it always spins forward
-            const [wheelRotation, setWheelRotation] = useState(0);
-            
             const spinSound = useRef(new Audio("https://cdn.freesound.org/previews/256/256113_3263906-lq.mp3"));
 
             useEffect(() => {
@@ -360,14 +353,8 @@
                     if (doc.exists()) {
                         const data = doc.data();
                         setGameData(data);
-                        
-                        // Handle Spin State
                         if (data.isSpinning) {
                             setIsSpinning(true);
-                            // If we just started spinning, add a "spinning" rotation (visual only)
-                            // We keep adding rotation so it looks continuous until result arrives
-                            setWheelRotation(prev => prev + 720); 
-                            
                             if(!interval && soundOn) {
                                 interval = setInterval(() => {
                                     spinSound.current.currentTime = 0;
@@ -378,21 +365,12 @@
                         } else {
                             setIsSpinning(false);
                             if(interval) clearInterval(interval);
-                            
-                            // If we have a new number, LAND the wheel
-                            if(data.lastNumber && data.lastNumber !== currentNumber) {
-                                setCurrentNumber(data.lastNumber);
-                                // RANDOM LANDING LOGIC:
-                                // Add 1080 (3 spins) + Random (0-360)
-                                // This ensures the wheel stops at a random angle
-                                const randomStop = Math.floor(Math.random() * 360);
-                                setWheelRotation(prev => prev + 1080 + randomStop);
-                            }
+                            if(data.lastNumber) setCurrentNumber(data.lastNumber);
                         }
                     }
                 });
                 return () => { unsub(); if(interval) clearInterval(interval); };
-            }, [gameCode, soundOn, currentNumber]);
+            }, [gameCode, soundOn]);
 
             useEffect(() => { if(window.lucide) window.lucide.createIcons(); });
 
@@ -490,12 +468,7 @@
                     <Header />
                     <div className="game-content">
                         <div className="top-section">
-                             <RouletteWheel 
-                                isSpinning={isSpinning} 
-                                resultNumber={currentNumber} 
-                                zone={gameData?.zone || 'TEE'}
-                                wheelRotation={wheelRotation}
-                             />
+                             <RouletteWheel isSpinning={isSpinning} resultNumber={currentNumber} zone={gameData?.zone || 'TEE'} />
                         </div>
                         
                         <div className="bottom-section">
