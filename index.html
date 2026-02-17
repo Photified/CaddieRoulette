@@ -7,7 +7,7 @@
     
     <link rel="manifest" href="./manifest.json" />
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#064E3B">
+    <meta name="theme-color" content="#ffffff">
 
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -109,6 +109,7 @@
         }
         .game-content::-webkit-scrollbar { display: none; }
         
+        /* THE MAIN CONTROL CARD */
         .card { 
             background: var(--glass); 
             padding: 16px; 
@@ -117,7 +118,7 @@
             margin-bottom: 20px; 
             animation: slideUp 0.3s ease-out;
             position: relative; 
-            overflow: hidden;
+            overflow: hidden; /* Important for the overlay */
         }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
@@ -136,27 +137,28 @@
         .btn-danger { background: #fee2e2; color: #dc2626; font-weight: 700; box-shadow: none; }
         .btn-outline { background: white; border: 2px solid #E5E7EB; color: #374151; box-shadow: 0 4px 0 #E5E7EB; }
         
-        /* WHEEL STYLES - FIXED RIM */
+        /* === WHEEL STYLES === */
         .wheel-container-wrapper {
             position: relative; display: flex; justify-content: center; margin-bottom: 20px; min-height: 300px;
         }
         .wheel-stage {
             position: relative; width: 300px; height: 300px; border-radius: 50%;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            background: #111827; /* Dark background behind wheel */
+            background: #111827; 
             overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
         
-        /* THICKER RIM TO HIDE GLITCHES */
+        /* RIM FIXED: Full size, border inset */
         .wheel-rim {
-            position: absolute; width: 260px; height: 260px; border-radius: 50%;
-            border: 16px solid #1F2937; /* Much thicker, dark rim */
+            position: absolute; width: 300px; height: 300px; border-radius: 50%;
+            border: 16px solid #281D11; /* Dark Wood Rim */
             box-shadow: inset 0 0 20px rgba(0,0,0,0.8); 
-            z-index: 5; pointer-events: none;
+            z-index: 20; pointer-events: none;
         }
         
+        /* SPINNER */
         .wheel-spinner {
-            width: 290px; height: 290px; border-radius: 50%; position: relative;
+            width: 300px; height: 300px; border-radius: 50%; position: relative;
             transition: transform 3s cubic-bezier(0.2, 0.8, 0.1, 1); 
             background: conic-gradient(
                 #DC2626 0deg 30deg, #1F2937 30deg 60deg, 
@@ -171,6 +173,7 @@
         .wheel-spinner.spinning { animation: spinCW 0.6s linear infinite; }
         @keyframes spinCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* NUMBERS MOVED INWARD (-105px) TO CLEAR RIM */
         .wheel-number {
             position: absolute; top: 50%; left: 50%;
             font-family: var(--font-display); color: white; font-size: 18px; width: 20px; height: 20px; line-height: 20px; text-align: center;
@@ -178,56 +181,58 @@
         }
 
         .ball-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 25;
         }
         .ball-container.spinning { animation: spinCCW 1.5s linear infinite; }
         @keyframes spinCCW { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
+        
         .ball {
-            position: absolute; top: 20px; left: 50%; margin-left: -6px; width: 12px; height: 12px;
+            position: absolute; top: 22px; left: 50%; margin-left: -6px; width: 12px; height: 12px;
             background: #FFFFFF; border-radius: 50%; box-shadow: 0 0 4px rgba(0,0,0,0.8);
         }
         .ball-container.spinning .ball { animation: bounce 0.3s ease-in-out infinite alternate; }
-        @keyframes bounce { from { top: 20px; } to { top: 15px; } }
+        @keyframes bounce { from { top: 22px; } to { top: 18px; } }
 
         .wheel-center {
             position: absolute; width: 120px; height: 120px; background: #111827; border: 4px solid #FACC15;
             border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 20; box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            z-index: 30; box-shadow: 0 0 20px rgba(0,0,0,0.8);
         }
         .result-number { font-size: 42px; font-weight: 900; color: white; line-height: 1; }
         .result-label { font-size: 10px; color: #FACC15; font-weight: 700; letter-spacing: 1px; margin-top: 4px; }
 
-        /* --- REDESIGNED POPUP --- */
+        /* --- POPUP OVERLAY INSIDE THE CARD --- */
         .controls-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #FFFFFF;
             z-index: 50;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             padding: 20px; text-align: center;
-            
-            /* Clean Card Style */
-            border: 4px solid #1F2937;
-            border-radius: 20px;
             animation: fadeIn 0.2s ease;
+            
+            /* Border style requested */
+            border: 4px solid #DC2626;
+            box-shadow: inset 0 0 0 4px #1F2937;
+            border-radius: 24px; /* Matches card radius */
         }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* BADGE INSIDE CARD */
+        /* BADGE */
         .result-badge {
             background: #DC2626; color: white;
-            width: 60px; height: 60px; border-radius: 50%;
+            width: 50px; height: 50px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-family: var(--font-display); font-size: 32px;
-            border: 4px solid #1F2937;
-            margin-bottom: 16px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            font-family: var(--font-display); font-size: 24px;
+            border: 3px solid #1F2937;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
         
         .result-text { 
             color: #1F2937; font-family: var(--font-display); 
-            font-size: 28px; 
-            line-height: 1.1; margin-bottom: 24px; 
-            text-transform: uppercase; padding: 0 10px;
+            font-size: 26px; 
+            line-height: 1.1; margin-bottom: 20px; 
+            text-transform: uppercase;
         }
 
         /* CONTROLS */
@@ -414,9 +419,7 @@
         };
 
         const RouletteWheel = ({ isSpinning, resultNumber, zone, onClearResult }) => {
-            // Rotation Logic: 12 segments (30deg). Center is 15deg. 
-            // Rotation = -( (Num-1)*30 + 15 )
-            
+            // FIXED ROTATION: i*30+15deg to center segment. -105px translate to clear rim.
             return (
                 <div className="wheel-container-wrapper">
                     <div className="wheel-stage">
@@ -427,7 +430,7 @@
                         }}>
                             {[...Array(12)].map((_, i) => (
                                 <div key={i} className="wheel-number" style={{
-                                    transform: `rotate(${i * 30 + 15}deg) translate(0, -120px)`
+                                    transform: `rotate(${i * 30 + 15}deg) translate(0, -105px)`
                                 }}>
                                     {i + 1}
                                 </div>
@@ -681,12 +684,12 @@
                                     </div>
                                 )}
 
-                                {/* REDESIGNED RESULT POPUP */}
+                                {/* NEW COMPACT OVERLAY POPUP */}
                                 {!isSpinning && currentNumber && (
                                     <div className="controls-overlay">
                                          <div className="result-badge">{currentNumber}</div>
                                          <div className="result-text">{window.getChallengeText(currentNumber, zone)}</div>
-                                         <button className="btn btn-primary" onClick={handleClearResult} style={{marginTop:'auto', padding: '12px 30px'}}>OK</button>
+                                         <button className="btn btn-primary" onClick={handleClearResult} style={{marginTop:'auto', padding:'12px 30px'}}>OK</button>
                                     </div>
                                 )}
                             </div>
