@@ -53,9 +53,9 @@
             .app-container { max-width: 450px; margin: 0 auto; }
         }
 
-        /* HEADER */
+        /* HEADER - UPDATED HEIGHT */
         .header { 
-            height: 70px; 
+            height: 110px; /* Increased from 70px */
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -65,7 +65,9 @@
             width: 100%;
             background: #FFFFFF;
         }
-        .header-logo { height: 40px; width: 40px; }
+        /* HEADER LOGO - UPDATED SIZE */
+        .header-logo { height: 80px; width: 80px; } /* Increased from 40px */
+        
         .header-right { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
         .header-btn { background: transparent; border: none; cursor: pointer; color: #9CA3AF; padding: 8px; }
 
@@ -570,7 +572,8 @@
                 <div className="app-container">
                     <div className="game-content">
                         <div className="top-section" style={{flexDirection:'column'}}>
-                            <img src="./images/logo512.png" style={{width:120, height:120, marginBottom:30}} />
+                            {/* LOGO UPDATED TO 220px */}
+                            <img src="./images/logo512.png" style={{width:220, height:220, marginBottom:30}} />
                             <h1 style={{fontFamily:'var(--font-display)', fontSize:48, lineHeight:1, marginBottom:10, color:'var(--primary)', textAlign:'center'}}>CADDIE<br/>ROULETTE</h1>
                         </div>
                         <div className="bottom-section">
