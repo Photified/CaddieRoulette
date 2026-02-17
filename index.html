@@ -31,7 +31,6 @@
             background-image: radial-gradient(circle at center, #065f46 0%, #022c22 100%);
             color: var(--text-main); 
             font-family: var(--font-sans); 
-            /* FIX 1: Use dvh (dynamic viewport height) to respect mobile browser bars */
             height: 100dvh; 
             overflow: hidden; 
             display: flex;
@@ -43,14 +42,11 @@
         .app-container { 
             width: 100%;
             max-width: 450px; 
-            height: 100%;
-            /* FIX 1: Match body height */
             height: 100dvh; 
             display: flex; 
             flex-direction: column; 
             position: relative;
             background: transparent;
-            /* FIX 2: Add padding for bottom safe area (home bar) */
             padding-bottom: env(safe-area-inset-bottom);
         }
         @media (min-width: 500px) {
@@ -60,14 +56,13 @@
                 height: 90vh;
                 overflow: hidden;
                 background: rgba(0,0,0,0.2); 
-                padding-bottom: 0; /* Reset for desktop */
+                padding-bottom: 0; 
             }
         }
 
         /* HEADER */
         .header { 
             background: #FFFFFF; 
-            /* Increase height slightly to accommodate notch padding */
             min-height: 90px;
             display: flex; 
             align-items: center; 
@@ -79,7 +74,6 @@
             border-bottom-right-radius: 24px;
             flex-shrink: 0;
             padding: 0 20px;
-            /* FIX 3: Add padding for top safe area (notch) */
             padding-top: env(safe-area-inset-top);
         }
         
@@ -90,7 +84,6 @@
         
         .header-left {
             position: absolute; left: 20px; 
-            /* Adjust top position to account for padding */
             top: calc(50% + env(safe-area-inset-top) / 2); 
             transform: translateY(-50%);
             display: flex; flex-direction: column; align-items: flex-start;
@@ -100,7 +93,6 @@
 
         .header-right { 
             position: absolute; right: 20px; 
-            /* Adjust top position to account for padding */
             top: calc(50% + env(safe-area-inset-top) / 2); 
             transform: translateY(-50%); 
         }
@@ -115,23 +107,23 @@
         /* CONTENT */
         .game-content { 
             flex: 1; 
-            /* Standard scrolling behavior */
             overflow-y: auto; 
-            -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+            -webkit-overflow-scrolling: touch; 
             padding: 20px; 
             display: flex; 
             flex-direction: column; 
             align-items: stretch;
             scrollbar-width: none; 
             position: relative;
-            /* Ensure content doesn't get cut off at very bottom */
             min-height: 0; 
         }
         .game-content::-webkit-scrollbar { display: none; }
         
+        /* CARD (Standardized) */
         .card { 
             background: var(--glass); 
-            padding: 16px; 
+            /* Removed default padding to allow edge-to-edge content (like results/leaderboard) */
+            padding: 0; 
             border-radius: 24px; 
             box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
             margin-bottom: 20px; 
@@ -140,9 +132,19 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            flex-shrink: 0; /* Prevent cards from squishing */
+            flex-shrink: 0;
+            width: 100%; /* Ensure full width */
         }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* Inner Content Wrapper (Use this for stuff that needs padding) */
+        .card-content {
+            padding: 16px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
 
         /* BUTTONS */
         .btn { 
@@ -162,7 +164,7 @@
         /* WHEEL STYLES */
         .wheel-container-wrapper {
             position: relative; display: flex; justify-content: center; margin-bottom: 20px; min-height: 300px;
-            flex-shrink: 0; /* Keep wheel full size */
+            flex-shrink: 0; 
         }
         .wheel-stage {
             position: relative; width: 300px; height: 300px; border-radius: 50%;
@@ -231,7 +233,8 @@
             padding: 20px; text-align: center;
             border: 4px solid #DC2626;
             box-shadow: inset 0 0 0 4px #1F2937;
-            border-radius: 18px;
+            /* Match Parent Radius so it looks like the card itself */
+            border-radius: 24px; 
             animation: fadeIn 0.2s ease;
         }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -610,14 +613,21 @@
             if (loading) return <div className="app-container" style={{justifyContent:'center', alignItems:'center', color:'white'}}>Loading...</div>;
 
             if (!user) return (
-                <div className="app-container" style={{justifyContent:'center'}}>
-                     <div className="card" style={{textAlign:'center', margin:'20px'}}>
-                        <img src="./images/logo512.png" className="header-logo" style={{width:100, height:100, margin:'0 auto 20px'}} />
-                        <h1 style={{fontFamily:'var(--font-display)', fontSize:32, lineHeight:1, marginBottom:10, color:'var(--primary)'}}>CADDIE ROULETTE</h1>
-                        <p style={{marginBottom:30, color:'#6B7280'}}>The ultimate golf party game.</p>
-                        <button className="btn btn-primary" onClick={handleLogin}>
-                            <i data-lucide="log-in"></i> Sign in with Google
-                        </button>
+                <div className="app-container">
+                    {/* WRAPPED IN GAME-CONTENT TO ENSURE EXACT SAME PADDING AS GAME VIEW */}
+                    <div className="game-content" style={{justifyContent:'center'}}>
+                         <div className="card" style={{textAlign:'center'}}>
+                            <div className="card-content">
+                                <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:10, marginBottom:20}}>
+                                    <img src="./images/logo512.png" className="header-logo" style={{width:100, height:100, margin:'0 auto 20px'}} />
+                                </div>
+                                <h1 style={{fontFamily:'var(--font-display)', fontSize:32, lineHeight:1, marginBottom:10, color:'var(--primary)'}}>CADDIE ROULETTE</h1>
+                                <p style={{marginBottom:30, color:'#6B7280'}}>The ultimate golf party game.</p>
+                                <button className="btn btn-primary" onClick={handleLogin}>
+                                    <i data-lucide="log-in"></i> Sign in with Google
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             );
@@ -661,21 +671,23 @@
                     {!gameCode ? (
                         <div className="game-content" style={{justifyContent:'center'}}>
                              <div className="card" style={{textAlign:'center'}}>
-                                <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:10, marginBottom:20}}>
-                                    <img src={user.photoURL} style={{width:40, height:40, borderRadius:'50%'}}/>
-                                    <h3 style={{fontSize:18}}>Hi, {user.displayName.split(" ")[0]}</h3>
-                                </div>
-                                <button className="btn btn-primary" onClick={createGame} style={{marginBottom:16}}>Start New Game</button>
-                                <div style={{margin:'24px 0', display:'flex', alignItems:'center', color:'#9CA3AF', fontSize:12, fontWeight:700}}>
-                                    <span style={{flex:1, height:1, background:'#E5E7EB'}}></span>
-                                    <span style={{padding:'0 10px'}}>OR JOIN FRIEND</span>
-                                    <span style={{flex:1, height:1, background:'#E5E7EB'}}></span>
-                                </div>
-                                <div style={{display:'flex', gap:8}}>
-                                    <input id="codeInput" className="input-lg" placeholder="CODE" maxLength="4" />
-                                    <button className="btn btn-accent" style={{width:'auto', padding:'0 24px'}} onClick={() => joinGame(document.getElementById('codeInput').value)}>
-                                        <i data-lucide="arrow-right"></i>
-                                    </button>
+                                <div className="card-content">
+                                    <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:10, marginBottom:20}}>
+                                        <img src={user.photoURL} style={{width:40, height:40, borderRadius:'50%'}}/>
+                                        <h3 style={{fontSize:18}}>Hi, {user.displayName.split(" ")[0]}</h3>
+                                    </div>
+                                    <button className="btn btn-primary" onClick={createGame} style={{marginBottom:16}}>Start New Game</button>
+                                    <div style={{margin:'24px 0', display:'flex', alignItems:'center', color:'#9CA3AF', fontSize:12, fontWeight:700}}>
+                                        <span style={{flex:1, height:1, background:'#E5E7EB'}}></span>
+                                        <span style={{padding:'0 10px'}}>OR JOIN FRIEND</span>
+                                        <span style={{flex:1, height:1, background:'#E5E7EB'}}></span>
+                                    </div>
+                                    <div style={{display:'flex', gap:8}}>
+                                        <input id="codeInput" className="input-lg" placeholder="CODE" maxLength="4" />
+                                        <button className="btn btn-accent" style={{width:'auto', padding:'0 24px'}} onClick={() => joinGame(document.getElementById('codeInput').value)}>
+                                            <i data-lucide="arrow-right"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -690,15 +702,15 @@
                             
                             <div className="card">
                                 {!isSpinning && currentNumber ? (
-                                    /* NEW LAYOUT: Show Result Overlay INSTEAD of controls */
+                                    /* NEW LAYOUT: Show Result Overlay DIRECTLY in card (Full Width) */
                                     <div className="controls-overlay">
                                          <div className="result-badge">{currentNumber}</div>
                                          <div className="result-text">{window.getChallengeText(currentNumber, zone)}</div>
                                          <button className="btn btn-primary" onClick={handleClearResult} style={{marginTop:'auto', padding:'12px 30px'}}>OK</button>
                                     </div>
                                 ) : (
-                                    /* DEFAULT LAYOUT: Show Controls */
-                                    <>
+                                    /* DEFAULT LAYOUT: Wrapped in Padded Content */
+                                    <div className="card-content">
                                         {(gameData && gameData.host === user.uid) ? (
                                             <>
                                                 <div className="zone-selector">
@@ -715,7 +727,7 @@
                                                 {isSpinning ? 'HOST IS SPINNING...' : 'WAITING FOR HOST'}
                                             </div>
                                         )}
-                                    </>
+                                    </div>
                                 )}
                             </div>
 
