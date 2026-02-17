@@ -116,7 +116,7 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.3); 
             margin-bottom: 20px; 
             animation: slideUp 0.3s ease-out;
-            position: relative; /* For absolute overlay */
+            position: relative; 
             overflow: hidden;
         }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -166,8 +166,7 @@
         .wheel-spinner.spinning { animation: spinCW 0.6s linear infinite; }
         @keyframes spinCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- FIXED NUMBER ALIGNMENT --- */
-        /* Center of segment is 15deg. We rotate by i*30 + 15 to center it. */
+        /* --- FIXED NUMBER ALIGNMENT (Facing Center) --- */
         .wheel-number {
             position: absolute; top: 50%; left: 50%;
             font-family: var(--font-display); color: white; font-size: 16px; width: 20px; height: 20px; line-height: 20px; text-align: center;
@@ -194,20 +193,32 @@
         .result-number { font-size: 42px; font-weight: 900; color: white; line-height: 1; }
         .result-label { font-size: 10px; color: #FACC15; font-weight: 700; letter-spacing: 1px; margin-top: 4px; }
 
-        /* --- NEW CONTROLS OVERLAY --- */
+        /* --- CONTROLS OVERLAY (White/Red/Black Theme) --- */
         .controls-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(31, 41, 55, 0.95); /* Dark semi-transparent */
+            background: #FFFFFF; /* White Background */
             z-index: 50;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             padding: 20px; text-align: center;
-            backdrop-filter: blur(4px);
+            
+            /* Double Border Effect */
+            border: 4px solid #DC2626; /* Red Border */
+            box-shadow: inset 0 0 0 2px white, 0 0 0 4px #111827; /* Black outer stroke via shadow */
+            
+            border-radius: 20px;
             animation: fadeIn 0.3s ease;
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .controls-overlay h3 { color: #FACC15; font-family: var(--font-display); font-size: 24px; letter-spacing: 1px; margin-bottom: 10px; }
-        .controls-overlay p { color: white; font-size: 18px; line-height: 1.4; margin-bottom: 20px; font-weight: 600; }
+        .result-title { 
+            color: #DC2626; font-size: 11px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; 
+            border-bottom: 2px solid #F3F4F6; padding-bottom: 8px; width: 100%;
+        }
+        
+        .result-text { 
+            color: #1F2937; font-family: var(--font-display); font-size: 32px; line-height: 1.1; margin-bottom: 24px; 
+            text-transform: uppercase;
+        }
 
         /* CONTROLS */
         .zone-selector { display: flex; gap: 8px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 16px; }
@@ -392,7 +403,7 @@
             );
         };
 
-        const RouletteWheel = ({ isSpinning, resultNumber, zone }) => {
+        const RouletteWheel = ({ isSpinning, resultNumber, zone, onClearResult }) => {
             // FIXED ROTATION MATH:
             // 1. Center of segment is +15deg. 
             // 2. To put Center at Top (0deg), we rotate NEGATIVE.
@@ -407,9 +418,9 @@
                             transform: !isSpinning && resultNumber ? `rotate(-${(resultNumber - 1) * 30 + 15}deg)` : 'rotate(0deg)'
                         }}>
                             {[...Array(12)].map((_, i) => (
-                                // Place at start of wedge (i*30) + 15deg to center.
+                                // Rotate the container for placement (i*30 + 15), translate out, NO counter rotation needed for "facing center"
                                 <div key={i} className="wheel-number" style={{
-                                    transform: `rotate(${i * 30 + 15}deg) translate(0, -105px) rotate(-${i * 30 + 15}deg)`
+                                    transform: `rotate(${i * 30 + 15}deg) translate(0, -110px)`
                                 }}>
                                     {i + 1}
                                 </div>
@@ -642,6 +653,7 @@
                                 isSpinning={isSpinning} 
                                 resultNumber={currentNumber} 
                                 zone={gameData?.zone || 'TEE'} 
+                                onClearResult={handleClearResult}
                             />
                             
                             <div className="card">
@@ -665,9 +677,9 @@
                                 {/* OVERLAY POPUP FOR RESULT INSIDE THE CARD */}
                                 {!isSpinning && currentNumber && (
                                     <div className="controls-overlay">
-                                         <h3>CHALLENGE #{currentNumber}</h3>
-                                         <p>{window.getChallengeText(currentNumber, zone)}</p>
-                                         <button className="btn btn-primary" onClick={handleClearResult}>OK</button>
+                                         <div className="result-title">CHALLENGE #{currentNumber}</div>
+                                         <div className="result-text">{window.getChallengeText(currentNumber, zone)}</div>
+                                         <button className="btn btn-primary" onClick={handleClearResult} style={{marginTop:'auto'}}>OK</button>
                                     </div>
                                 )}
                             </div>
