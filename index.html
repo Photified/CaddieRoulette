@@ -570,7 +570,7 @@
                     }}>
                         {SLOTS.map((slot, i) => (
                             <div key={i} className="wheel-number" style={{
-                                transform: `rotate(${i * anglePerSlot + (anglePerSlot / 2)}deg) translateY(-120px)`
+                                transform: `rotate(${i * anglePerSlot + (anglePerSlot / 2)}deg) translateY(-115px)`
                             }}>
                                 {slot}
                             </div>
@@ -585,7 +585,10 @@
 
                     <div className="wheel-center">
                         {isSpinning ? (
-                                <div style={{fontSize:10, color:'#FACC15', fontWeight:800}}>SPINNING</div>
+                            <>
+                                <div className="result-label-center">{zone}</div>
+                                <div style={{fontSize:10, color:'#FACC15', fontWeight:800, marginTop: 4}}>SPINNING</div>
+                            </>
                         ) : (
                             <>
                                 <div className="result-label-center">{zone}</div>
@@ -740,7 +743,10 @@
             );
 
             // --- 3. GAME PAGE ---
-            const displayZone = gameData?.zone && CHALLENGES[gameData.zone] ? gameData.zone : "PAR 4 TEE";
+            
+            // Fix: Show the host's local zone selection immediately, otherwise show database zone
+            const isHost = gameData && user && gameData.host === user.uid;
+            const displayZone = isHost ? zone : (gameData?.zone && CHALLENGES[gameData.zone] ? gameData.zone : "PAR 4 TEE");
             
             return (
                 <div className="app-container">
