@@ -126,7 +126,7 @@
             background: #FFFFFF;
         }
 
-        /* WHEEL COMPONENT */
+        /* WHEEL COMPONENT - UPDATED FOR 24 SLICES */
         .wheel-stage {
             position: relative; width: 280px; height: 280px; border-radius: 50%;
             background: #111827; 
@@ -139,9 +139,12 @@
         .wheel-spinner {
             width: 94%; height: 94%; border-radius: 50%; position: relative;
             background: conic-gradient(
-                #DC2626 0deg 30deg, #1F2937 30deg 60deg, #DC2626 60deg 90deg, #1F2937 90deg 120deg, 
-                #DC2626 120deg 150deg, #1F2937 150deg 180deg, #DC2626 180deg 210deg, #1F2937 210deg 240deg, 
-                #DC2626 240deg 270deg, #1F2937 270deg 300deg, #DC2626 300deg 330deg, #1F2937 330deg 360deg
+                #DC2626 0deg 15deg, #1F2937 15deg 30deg, #DC2626 30deg 45deg, #1F2937 45deg 60deg,
+                #DC2626 60deg 75deg, #1F2937 75deg 90deg, #DC2626 90deg 105deg, #1F2937 105deg 120deg,
+                #DC2626 120deg 135deg, #1F2937 135deg 150deg, #DC2626 150deg 165deg, #1F2937 165deg 180deg,
+                #DC2626 180deg 195deg, #1F2937 195deg 210deg, #DC2626 210deg 225deg, #1F2937 225deg 240deg,
+                #DC2626 240deg 255deg, #1F2937 255deg 270deg, #DC2626 270deg 285deg, #1F2937 285deg 300deg,
+                #DC2626 300deg 315deg, #1F2937 315deg 330deg, #DC2626 330deg 345deg, #1F2937 345deg 360deg
             );
             transition: transform 3s cubic-bezier(0.2, 0.8, 0.1, 1); 
             transform: rotate(0deg);
@@ -149,10 +152,10 @@
         .wheel-spinner.spinning { animation: spinCW 0.6s linear infinite; }
         @keyframes spinCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* NUMBERS */
+        /* NUMBERS - Font size reduced to fit 24 */
         .wheel-number {
             position: absolute; top: 50%; left: 50%;
-            font-family: var(--font-display); color: white; font-size: 16px; 
+            font-family: var(--font-display); color: white; font-size: 13px; 
             width: 20px; height: 20px; line-height: 20px; text-align: center;
             margin-top: -10px; margin-left: -10px; 
             text-shadow: 0 1px 2px rgba(0,0,0,0.8);
@@ -199,7 +202,7 @@
         .btn-primary { background: var(--primary); color: white; }
         .btn-accent { background: var(--accent); color: #422006; }
         
-        /* UPDATED ZONE SELECTOR FOR 7 BUTTONS */
+        /* ZONE SELECTOR FOR 7 BUTTONS */
         .zone-selector { 
             display: flex; 
             flex-wrap: wrap; 
@@ -235,9 +238,9 @@
         @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
         .result-text { 
-            font-family: var(--font-display); font-size: 36px; color: #1F2937; 
+            font-family: var(--font-display); font-size: 30px; color: #1F2937; 
             text-transform: uppercase; text-align: center; line-height: 1.1; margin-bottom: 30px;
-            width: 100%;
+            width: 100%; padding: 0 10px;
         }
         .result-badge-big {
             width: 60px; height: 60px; background: #DC2626; color: white; border-radius: 50%;
@@ -271,7 +274,7 @@
         .howto-text { font-size: 14px; color: #4B5563; line-height: 1.4; padding-top: 4px; font-weight: 500; }
         .howto-title { font-size: 12px; font-weight: 800; color: #9CA3AF; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; text-align: left; display: block; }
 
-        /* RULES LIST UPDATED FOR MORE ZONES */
+        /* RULES LIST */
         .rules-zone-nav { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 15px; justify-content: center; }
         .rules-zone-btn { flex: 1 1 calc(30% - 8px); min-width: 70px; padding: 8px 4px; font-size: 9px; font-weight: 800; background: #F3F4F6; border-radius: 6px; border:none; color: #9CA3AF; cursor: pointer; letter-spacing: 0.5px;}
         .rules-zone-btn.active { background: #1F2937; color: white; }
@@ -309,48 +312,77 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
+        // EXPANDED TO 24 CHALLENGES PER CATEGORY
         const CHALLENGES = {
             "PAR 3 TEE": [
                 "Putter off the Tee", "Opponent Picks Club", "Eyes Closed Swing",
                 "Baseball Grip", "Stand on One Leg", "Cross-Handed Grip",
                 "No Tees Allowed", "3-Second Swing", "Yell 'FORE' at Impact",
-                "Half-Swing Only", "Commentate Your Shot", "Must Hit a Fade"
+                "Half-Swing Only", "Commentate Your Shot", "Must Hit a Fade",
+                "Must Hit a Draw", "Drop Ball (No Tee)", "7-Iron Only",
+                "Swing While Talking", "Opposite Handed", "Speed Golf (10 sec)",
+                "Opponent Distracts You", "No Practice Swings", "Choke Down to Shaft",
+                "Stinger Only", "Dizzy Bat (3 spins)", "Swing on Knees"
             ],
             "PAR 4 TEE": [
                 "Driver off the Deck", "7-Iron Only", "Happy Gilmore", 
                 "Wrong Handed", "Tee it High (Driver)", "No Practice Swing", 
                 "Must Hit Draw", "Must Hit Fade", "No Glove Allowed", 
-                "Eyes Closed Swing", "Dizzy Bat (Spin 3x First)", "Opposite Stance"
+                "Eyes Closed Swing", "Dizzy Bat (Spin 3x)", "Opposite Stance",
+                "Putter off Tee", "3-Wood Only", "Swing 50% Speed", 
+                "One Handed Finish", "Baseball Grip", "Yell 'Baba Booey'", 
+                "Drop Ball (No Tee)", "Opponent Tees It Up", "Stand on One Leg", 
+                "3-Second Swing", "Cross-Handed", "Commentate Your Shot"
             ],
             "PAR 5 TEE": [
                 "Happy Gilmore", "Wood/Hybrid Only", "Swing 110% Effort", 
                 "No Practice Swing", "Commentate Your Shot", "Eyes Closed Impact", 
                 "Wrong Handed", "Tee it as Low as Possible", "3-Second Swing", 
-                "Opponent Tees It Up", "Must Yell 'MASHED POTATOES'", "One Handed Finish"
+                "Opponent Tees It Up", "Yell 'MASHED POTATOES'", "One Handed Finish",
+                "Driver off the Deck", "7-Iron Only", "Dizzy Bat (5 spins)", 
+                "No Tees Allowed", "Cross-Handed Grip", "Baseball Grip", 
+                "Opposite Stance", "Swing While Talking", "Opponent Picks Club", 
+                "Stand on One Leg", "Must Hit a Fade", "Must Hit a Draw"
             ],
             "FAIRWAY": [
                 "Club Up 2 (Half Swing)", "Putter from Fairway", "Baseball Grip",
                 "Low Stinger", "Stand on One Leg", "Opponent Picks Club",
                 "Eyes Closed Impact", "3-Second Swing", "Cross-Handed Grip",
-                "Pick it Clean (No Divot)", "Wrong Handed", "Play on Your Knees"
+                "Pick it Clean (No Divot)", "Wrong Handed", "Play on Your Knees",
+                "Club Down 2 (Swing Hard)", "No Practice Swings", "Swing 50% Speed", 
+                "Drop Ball Again", "Opposite Stance", "One Handed Finish", 
+                "Commentate Your Shot", "Yell 'Get in the hole!'", "Foot Wedge (Kick 10ft)", 
+                "7-Iron Only", "Play with No Glove", "Happy Gilmore Step"
             ],
             "ROUGH": [
                 "Use a Wood/Hybrid", "Club Down 2 (Swing Hard)", "Baseball Grip",
                 "Eyes Closed Swing", "No Practice Swing", "Foot Wedge (Kick it 10ft)",
                 "Chop it out (Wedge Only)", "One Handed Finish", "Stand on One Leg",
-                "Opponent Picks Club", "Yell 'FORE' at Impact", "Play from Knees"
+                "Opponent Picks Club", "Yell 'FORE' at Impact", "Play from Knees",
+                "Club Up 2 (Half Swing)", "Putter out of Rough", "Wrong Handed", 
+                "Cross-Handed Grip", "Stinger Attempt", "Pick it Clean", 
+                "Opposite Stance", "Opponent Drops Ball", "3-Second Swing", 
+                "Swing 110% Effort", "Commentate Shot", "Dizzy Bat (3 spins)"
             ],
             "BUNKER": [
                 "Play with Eyes Closed", "Putter out of Sand", "Hit Backwards",
-                "Opponent Draws Line Behind Ball", "One Handed Splash", "No Practice Swing",
-                "Use a 7-Iron", "Both Feet Outside Bunker", "Must Yell 'KOBE'",
-                "Baseball Grip", "Wrong Handed", "Opponent Drops the Ball"
+                "Opponent Draws Line", "One Handed Splash", "No Practice Swing",
+                "Use a 7-Iron", "Feet Outside Bunker", "Must Yell 'KOBE'",
+                "Baseball Grip", "Wrong Handed", "Opponent Drops Ball",
+                "Use a Wood/Hybrid", "Cross-Handed Grip", "Swing 110% Effort", 
+                "Play on Knees", "Stand on One Leg", "3-Second Swing", 
+                "Opposite Stance", "Commentate Shot", "No Raking (Play as lies)", 
+                "Face Completely Closed", "Foot Wedge", "Use Your Hand (Toss it)"
             ],
             "GREEN": [
                 "Putt with Wedge", "Pool Cue Style", "Eyes Closed Putt",
                 "Opponent Places Ball", "Pin In", "Chip on Green",
                 "Putt Between Legs", "One Handed Putt", "No Read Allowed",
-                "Knee Putt", "Reverse Grip", "Eyes Open (Normal)"
+                "Knee Putt", "Reverse Grip", "Eyes Open (Normal)",
+                "Putt with Driver", "Hit Backwards", "Use Wrong End of Putter", 
+                "Opposite Stance", "Opponent Reads Putt", "Blow on Ball (No Club)", 
+                "3-Second Putt", "Stand on One Leg", "Putt from Off Green", 
+                "Yell 'It's in the hole!'", "No Practice Putts", "Cross-Handed Grip"
             ]
         };
 
@@ -375,13 +407,11 @@
             return (
                 <div className="modal-overlay" onClick={onClose}>
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        {/* HEADER WITH CLOSE */}
                         <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'20px 20px 0 20px'}}>
                             <h2 style={{fontFamily:'var(--font-display)', fontSize:28, color:'#1F2937'}}>MENU</h2>
                             <button onClick={onClose} style={{border:'none', background:'transparent'}}><i data-lucide="x" color="#9CA3AF" size="24"></i></button>
                         </div>
 
-                        {/* TABS */}
                         <div className="modal-tabs">
                             <div className={`modal-tab ${tab === 'SETTINGS' ? 'active' : ''}`} onClick={() => setTab('SETTINGS')}>SETTINGS</div>
                             <div className={`modal-tab ${tab === 'RULES' ? 'active' : ''}`} onClick={() => setTab('RULES')}>CHALLENGES</div>
@@ -443,19 +473,20 @@
             );
         };
 
-        // WHEEL COMPONENT
+        // WHEEL COMPONENT - 24 SLOTS
         const RouletteWheel = ({ isSpinning, resultNumber, zone }) => {
             const [landingAngle, setLandingAngle] = useState(0);
 
             useEffect(() => {
                 if (!isSpinning && resultNumber) {
-                    const randomSlot = Math.floor(Math.random() * 12);
-                    const angle = randomSlot * 30; 
+                    const randomSlot = Math.floor(Math.random() * 24);
+                    const angle = randomSlot * 15; // 360 / 24 = 15 degrees per slot
                     setLandingAngle(angle);
                 }
             }, [isSpinning, resultNumber]);
 
-            const targetNumberAngle = resultNumber ? ((resultNumber - 1) * 30 + 15) : 0;
+            // Calculate rotation offsets for 24 slots (15 deg per slice, center is at 7.5 deg)
+            const targetNumberAngle = resultNumber ? ((resultNumber - 1) * 15 + 7.5) : 0;
             const wheelRotation = landingAngle - targetNumberAngle;
             
             return (
@@ -465,9 +496,9 @@
                     <div className={`wheel-spinner ${isSpinning ? 'spinning' : ''}`} style={{
                         transform: !isSpinning && resultNumber ? `rotate(${wheelRotation}deg)` : 'rotate(0deg)'
                     }}>
-                        {[...Array(12)].map((_, i) => (
+                        {[...Array(24)].map((_, i) => (
                             <div key={i} className="wheel-number" style={{
-                                transform: `rotate(${i * 30 + 15}deg) translate(0, -100px)`
+                                transform: `rotate(${i * 15 + 7.5}deg) translate(0, -115px)`
                             }}>
                                 {i + 1}
                             </div>
@@ -568,7 +599,7 @@
                 const ref = window.ops.doc(window.db, "games", gameCode);
                 await window.ops.updateDoc(ref, { isSpinning: true, zone: zone, lastNumber: null });
                 setTimeout(async () => {
-                    const result = Math.floor(Math.random() * 12) + 1;
+                    const result = Math.floor(Math.random() * 24) + 1; // RANDOM 1 TO 24
                     await window.ops.updateDoc(ref, { isSpinning: false, lastNumber: result });
                 }, 3000); 
             };
@@ -635,7 +666,6 @@
             );
 
             // --- 3. GAME PAGE ---
-            // Fallback for old game states just in case
             const displayZone = gameData?.zone && CHALLENGES[gameData.zone] ? gameData.zone : "PAR 4 TEE";
             
             return (
