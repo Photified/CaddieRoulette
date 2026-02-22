@@ -53,9 +53,9 @@
             .app-container { max-width: 450px; margin: 0 auto; }
         }
 
-        /* HEADER - UPDATED HEIGHT */
+        /* HEADER */
         .header { 
-            height: 110px; /* Increased from 70px */
+            height: 110px;
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -65,8 +65,7 @@
             width: 100%;
             background: #FFFFFF;
         }
-        /* HEADER LOGO - UPDATED SIZE */
-        .header-logo { height: 80px; width: 80px; } /* Increased from 40px */
+        .header-logo { height: 80px; width: 80px; }
         
         .header-right { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
         .header-btn { background: transparent; border: none; cursor: pointer; color: #9CA3AF; padding: 8px; }
@@ -147,7 +146,6 @@
             transition: transform 3s cubic-bezier(0.2, 0.8, 0.1, 1); 
             transform: rotate(0deg);
         }
-        /* Wheel spins Clockwise */
         .wheel-spinner.spinning { animation: spinCW 0.6s linear infinite; }
         @keyframes spinCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
@@ -168,8 +166,6 @@
             z-index: 50; 
             transition: transform 3s cubic-bezier(0.2, 0.8, 0.1, 1);
         }
-        
-        /* Ball spins Counter-Clockwise */
         .ball-container.spinning { animation: spinCCW 1.2s linear infinite; }
         @keyframes spinCCW { 0% { transform: rotate(0deg); } 100% { transform: rotate(-360deg); } }
 
@@ -189,7 +185,7 @@
             z-index: 30;
         }
         .result-number-center { font-size: 38px; font-weight: 900; color: white; line-height: 1; }
-        .result-label-center { font-size: 10px; color: #FACC15; font-weight: 700; letter-spacing: 1px; margin-top: 4px; }
+        .result-label-center { font-size: 10px; color: #FACC15; font-weight: 700; letter-spacing: 1px; margin-top: 4px; text-align: center; padding: 0 4px;}
 
         /* UI ELEMENTS */
         .btn { 
@@ -203,25 +199,30 @@
         .btn-primary { background: var(--primary); color: white; }
         .btn-accent { background: var(--accent); color: #422006; }
         
-        /* UPDATED ZONE SELECTOR: Wider with Gaps */
+        /* UPDATED ZONE SELECTOR FOR 7 BUTTONS */
         .zone-selector { 
             display: flex; 
-            gap: 12px; 
-            margin-bottom: 30px; 
+            flex-wrap: wrap; 
+            justify-content: center;
+            gap: 8px; 
+            margin-bottom: 20px; 
             background: transparent; 
             width: 100%; 
+            max-height: 120px;
+            overflow-y: auto;
         }
         .zone-btn { 
-            flex: 1; 
-            padding: 16px 4px; /* Added 4px side padding to prevent text touching edges */
-            border-radius: 12px; 
+            flex: 1 1 calc(33% - 16px); 
+            min-width: 85px; 
+            padding: 10px 4px; 
+            border-radius: 10px; 
             border: none; 
             background: #F3F4F6; 
             color: #9CA3AF; 
             font-weight: 800; 
-            font-size: 11px; 
+            font-size: 10px; 
             cursor: pointer; 
-            letter-spacing: 1px; 
+            letter-spacing: 0.5px; 
             transition: 0.2s;
         }
         .zone-btn.active { 
@@ -234,8 +235,8 @@
         @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
         .result-text { 
-            font-family: var(--font-display); font-size: 42px; color: #1F2937; 
-            text-transform: uppercase; text-align: center; line-height: 1; margin-bottom: 40px;
+            font-family: var(--font-display); font-size: 36px; color: #1F2937; 
+            text-transform: uppercase; text-align: center; line-height: 1.1; margin-bottom: 30px;
             width: 100%;
         }
         .result-badge-big {
@@ -270,9 +271,9 @@
         .howto-text { font-size: 14px; color: #4B5563; line-height: 1.4; padding-top: 4px; font-weight: 500; }
         .howto-title { font-size: 12px; font-weight: 800; color: #9CA3AF; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; text-align: left; display: block; }
 
-        /* RULES LIST */
-        .rules-zone-nav { display: flex; gap: 8px; margin-bottom: 15px; }
-        .rules-zone-btn { flex: 1; padding: 8px 0; font-size: 10px; font-weight: 800; background: #F3F4F6; border-radius: 8px; border:none; color: #9CA3AF; cursor: pointer; }
+        /* RULES LIST UPDATED FOR MORE ZONES */
+        .rules-zone-nav { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 15px; justify-content: center; }
+        .rules-zone-btn { flex: 1 1 calc(30% - 8px); min-width: 70px; padding: 8px 4px; font-size: 9px; font-weight: 800; background: #F3F4F6; border-radius: 6px; border:none; color: #9CA3AF; cursor: pointer; letter-spacing: 0.5px;}
         .rules-zone-btn.active { background: #1F2937; color: white; }
 
         .challenge-list { text-align: left; }
@@ -309,19 +310,43 @@
         const { useState, useEffect, useRef } = React;
 
         const CHALLENGES = {
-            TEE: [
-                "Driver off the Deck", "7-Iron Only", "Eyes Closed Swing", 
-                "Happy Gilmore", "Wrong Handed", "Wedge Only",
-                "Tee it High (Driver)", "No Practice Swing", "Must Hit Fade",
-                "Must Hit Draw", "No Glove Allowed", "Commentate Your Shot"
+            "PAR 3 TEE": [
+                "Putter off the Tee", "Opponent Picks Club", "Eyes Closed Swing",
+                "Baseball Grip", "Stand on One Leg", "Cross-Handed Grip",
+                "No Tees Allowed", "3-Second Swing", "Yell 'FORE' at Impact",
+                "Half-Swing Only", "Commentate Your Shot", "Must Hit a Fade"
             ],
-            APPROACH: [
+            "PAR 4 TEE": [
+                "Driver off the Deck", "7-Iron Only", "Happy Gilmore", 
+                "Wrong Handed", "Tee it High (Driver)", "No Practice Swing", 
+                "Must Hit Draw", "Must Hit Fade", "No Glove Allowed", 
+                "Eyes Closed Swing", "Dizzy Bat (Spin 3x First)", "Opposite Stance"
+            ],
+            "PAR 5 TEE": [
+                "Happy Gilmore", "Wood/Hybrid Only", "Swing 110% Effort", 
+                "No Practice Swing", "Commentate Your Shot", "Eyes Closed Impact", 
+                "Wrong Handed", "Tee it as Low as Possible", "3-Second Swing", 
+                "Opponent Tees It Up", "Must Yell 'MASHED POTATOES'", "One Handed Finish"
+            ],
+            "FAIRWAY": [
                 "Club Up 2 (Half Swing)", "Putter from Fairway", "Baseball Grip",
-                "One Handed Finish", "Low Stinger", "Stand on One Leg",
-                "Opponent Picks Club", "Aim Way Left (Slice Back)", "Aim Way Right (Hook Back)",
-                "Eyes Closed Impact", "3-Second Swing", "Yell 'FORE' at Impact"
+                "Low Stinger", "Stand on One Leg", "Opponent Picks Club",
+                "Eyes Closed Impact", "3-Second Swing", "Cross-Handed Grip",
+                "Pick it Clean (No Divot)", "Wrong Handed", "Play on Your Knees"
             ],
-            GREEN: [
+            "ROUGH": [
+                "Use a Wood/Hybrid", "Club Down 2 (Swing Hard)", "Baseball Grip",
+                "Eyes Closed Swing", "No Practice Swing", "Foot Wedge (Kick it 10ft)",
+                "Chop it out (Wedge Only)", "One Handed Finish", "Stand on One Leg",
+                "Opponent Picks Club", "Yell 'FORE' at Impact", "Play from Knees"
+            ],
+            "BUNKER": [
+                "Play with Eyes Closed", "Putter out of Sand", "Hit Backwards",
+                "Opponent Draws Line Behind Ball", "One Handed Splash", "No Practice Swing",
+                "Use a 7-Iron", "Both Feet Outside Bunker", "Must Yell 'KOBE'",
+                "Baseball Grip", "Wrong Handed", "Opponent Drops the Ball"
+            ],
+            "GREEN": [
                 "Putt with Wedge", "Pool Cue Style", "Eyes Closed Putt",
                 "Opponent Places Ball", "Pin In", "Chip on Green",
                 "Putt Between Legs", "One Handed Putt", "No Read Allowed",
@@ -344,7 +369,7 @@
 
         const SettingsModal = ({ isOpen, onClose, soundOn, toggleSound, onLogout }) => {
             const [tab, setTab] = useState('SETTINGS');
-            const [viewZone, setViewZone] = useState('TEE');
+            const [viewZone, setViewZone] = useState('PAR 4 TEE');
 
             if (!isOpen) return null;
             return (
@@ -369,7 +394,7 @@
                                         <span className="howto-title">How To Play</span>
                                         <div className="howto-step">
                                             <div className="howto-num">1</div>
-                                            <div className="howto-text">Host selects the Zone (Tee, Approach, or Green) based on where your group is.</div>
+                                            <div className="howto-text">Host selects the Zone (Par 3, Fairway, Bunker, etc.) based on where your group is.</div>
                                         </div>
                                         <div className="howto-step">
                                             <div className="howto-num">2</div>
@@ -474,7 +499,7 @@
             const [gameCode, setGameCode] = useState("");
             const [gameData, setGameData] = useState(null);
             const [loading, setLoading] = useState(true);
-            const [zone, setZone] = useState("TEE");
+            const [zone, setZone] = useState("PAR 4 TEE");
             const [currentNumber, setCurrentNumber] = useState(null);
             const [isSpinning, setIsSpinning] = useState(false);
             const [modal, setModal] = useState({ open: false, title: "", message: "" });
@@ -524,7 +549,7 @@
             const createGame = async () => {
                 const code = Math.random().toString(36).substring(2, 6).toUpperCase();
                 await window.ops.setDoc(window.ops.doc(window.db, "games", code), {
-                    host: user.uid, lastNumber: null, isSpinning: false, zone: "TEE", createdAt: new Date()
+                    host: user.uid, lastNumber: null, isSpinning: false, zone: "PAR 4 TEE", createdAt: new Date()
                 });
                 setGameCode(code);
             };
@@ -572,7 +597,6 @@
                 <div className="app-container">
                     <div className="game-content">
                         <div className="top-section" style={{flexDirection:'column'}}>
-                            {/* LOGO UPDATED TO 220px */}
                             <img src="./images/logo512.png" style={{width:220, height:220, marginBottom:30}} />
                             <h1 style={{fontFamily:'var(--font-display)', fontSize:48, lineHeight:1, marginBottom:10, color:'var(--primary)', textAlign:'center'}}>CADDIE<br/>ROULETTE</h1>
                         </div>
@@ -611,6 +635,9 @@
             );
 
             // --- 3. GAME PAGE ---
+            // Fallback for old game states just in case
+            const displayZone = gameData?.zone && CHALLENGES[gameData.zone] ? gameData.zone : "PAR 4 TEE";
+            
             return (
                 <div className="app-container">
                     <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} soundOn={soundOn} toggleSound={() => setSoundOn(!soundOn)} onLogout={handleLogout} />
@@ -618,21 +645,21 @@
                     <Header />
                     <div className="game-content">
                         <div className="top-section">
-                             <RouletteWheel isSpinning={isSpinning} resultNumber={currentNumber} zone={gameData?.zone || 'TEE'} />
+                             <RouletteWheel isSpinning={isSpinning} resultNumber={currentNumber} zone={displayZone} />
                         </div>
                         
                         <div className="bottom-section">
                             {!isSpinning && currentNumber ? (
                                 <div className="result-container">
                                         <div className="result-badge-big">{currentNumber}</div>
-                                        <div className="result-text">{CHALLENGES[gameData.zone][currentNumber - 1]}</div>
+                                        <div className="result-text">{CHALLENGES[displayZone][currentNumber - 1]}</div>
                                         <button className="btn btn-primary" onClick={() => setCurrentNumber(null)}>OK</button>
                                 </div>
                             ) : (
                                 (gameData && gameData.host === user.uid) ? (
                                     <>
                                         <div className="zone-selector">
-                                            {['TEE', 'APPROACH', 'GREEN'].map(z => (
+                                            {Object.keys(CHALLENGES).map(z => (
                                                 <button key={z} className={`zone-btn ${zone === z ? 'active' : ''}`} onClick={() => setZone(z)}>{z}</button>
                                             ))}
                                         </div>
