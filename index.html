@@ -70,31 +70,6 @@
         .header-right { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
         .header-btn { background: transparent; border: none; cursor: pointer; color: #9CA3AF; padding: 8px; }
 
-        /* ROOM CODE STYLES */
-        .room-info-container {
-            position: absolute; 
-            left: 20px; 
-            top: 50%; 
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-        }
-        .room-label {
-            font-size: 10px;
-            font-weight: 800;
-            color: #9CA3AF;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
-        }
-        .room-code { 
-            font-family: var(--font-display); 
-            font-size: 20px; 
-            color: #6B7280; 
-            letter-spacing: 1px; 
-            line-height: 1;
-        }
-
         /* LAYOUT */
         .game-content { 
             flex: 1; 
@@ -301,9 +276,6 @@
             width: 100%;
         }
 
-        .input-lg { font-size: 24px; padding: 20px; text-align: center; border: 2px solid #E5E7EB; border-radius: 16px; width: 100%; outline: none; font-weight: 800; letter-spacing: 4px; text-transform: uppercase; background: #F9FAFB; margin-bottom: 20px; }
-        .input-lg:focus { border-color: var(--primary); background: white; }
-
         .modal-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
         .modal-content { background: white; width: 100%; max-width: 400px; text-align: center; display: flex; flex-direction: column; max-height: 90vh; }
         
@@ -433,20 +405,7 @@
             }
         };
 
-        const Modal = ({ isOpen, title, message, onClose }) => {
-            if (!isOpen) return null;
-            return (
-                <div className="modal-overlay" onClick={onClose}>
-                    <div className="modal-content" style={{padding: 20}} onClick={e => e.stopPropagation()}>
-                        <h3 style={{fontSize: 24, fontWeight: 900, marginBottom: 10, color: '#1F2937', textTransform:'uppercase'}}>{title}</h3>
-                        <p style={{color: '#4B5563', marginBottom: 30, fontSize:16, lineHeight:1.5}}>{message}</p>
-                        <button className="btn btn-primary" onClick={onClose}>GOT IT</button>
-                    </div>
-                </div>
-            );
-        };
-
-        const SettingsModal = ({ isOpen, onClose, soundOn, toggleSound, onLogout }) => {
+        const SettingsModal = ({ isOpen, onClose, soundOn, toggleSound }) => {
             const [tab, setTab] = useState('SETTINGS');
             const [viewZone, setViewZone] = useState('PAR 4 TEE');
 
@@ -471,11 +430,11 @@
                                         <span className="howto-title">How To Play</span>
                                         <div className="howto-step">
                                             <div className="howto-num">1</div>
-                                            <div className="howto-text">Host selects the Zone (Par 3, Fairway, Bunker, etc.) based on where your group is.</div>
+                                            <div className="howto-text">Select the Zone (Par 3, Fairway, Bunker, etc.) based on where you're hitting from.</div>
                                         </div>
                                         <div className="howto-step">
                                             <div className="howto-num">2</div>
-                                            <div className="howto-text">Host spins the wheel. The result syncs to everyone's phone.</div>
+                                            <div className="howto-text">Place an optional bet on a number. Then spin the wheel!</div>
                                         </div>
                                         <div className="howto-step">
                                             <div className="howto-num">3</div>
@@ -489,10 +448,7 @@
                                              <div className="toggle-circle"></div>
                                          </div>
                                     </div>
-                                    
-                                    <div style={{marginTop:30, marginBottom: 20}}>
-                                        <button className="btn btn-primary" style={{background:'#FEE2E2', color:'#DC2626', boxShadow:'none', fontSize: 14, padding: '16px 0'}} onClick={onLogout}>EXIT GAME</button>
-                                    </div>
+                                    <div style={{height: 30}}></div>
                                 </>
                             ) : (
                                 <>
@@ -577,119 +533,44 @@
         };
 
         function App() {
-            const [hasStarted, setHasStarted] = useState(() => !!localStorage.getItem("cr_started"));
-            const [gameCode, setGameCode] = useState(() => localStorage.getItem("cr_game_code") || "");
-            const [isHost, setIsHost] = useState(() => localStorage.getItem("cr_is_host") === "true");
-            const [zone, setZone] = useState("PAR 4 TEE");
-            const [currentSlot, setCurrentSlot] = useState(null);
+            const [zone, setZone] = useState(() => localStorage.getItem("cr_zone") || "PAR 4 TEE");
+            const [currentSlot, setCurrentSlot] = useState(() => localStorage.getItem("cr_last_number") || null);
             const [betSlot, setBetSlot] = useState(null); 
             const [isSpinning, setIsSpinning] = useState(false);
-            const [modal, setModal] = useState({ open: false, title: "", message: "" });
             const [showSettings, setShowSettings] = useState(false);
             const [soundOn, setSoundOn] = useState(true);
             const spinSound = useRef(new Audio("https://cdn.freesound.org/previews/256/256113_3263906-lq.mp3"));
 
-            // Polling cycle to keep multiple local windows/tabs in sync if they share localStorage keys
-            useEffect(() => {
-                if (!gameCode) return;
-                let interval;
-                
-                const syncData = () => {
-                    const storedCode = localStorage.getItem("cr_game_code");
-                    if (storedCode === gameCode) {
-                        const localSpin = localStorage.getItem("cr_is_spinning") === "true";
-                        const localZone = localStorage.getItem("cr_zone") || "PAR 4 TEE";
-                        const localNumber = localStorage.getItem("cr_last_number");
-
-                        setZone(localZone);
-                        
-                        if (localSpin && !isSpinning) {
-                            setIsSpinning(true);
-                            if (soundOn && !interval) {
-                                interval = setInterval(() => {
-                                    spinSound.current.currentTime = 0;
-                                    spinSound.current.volume = 0.1;
-                                    spinSound.current.play().catch(e=>{});
-                                }, 100);
-                            }
-                        } else if (!localSpin) {
-                            setIsSpinning(false);
-                            if (interval) { clearInterval(interval); interval = null; }
-                            if (localNumber) setCurrentSlot(localNumber);
-                        }
-                    }
-                };
-
-                syncData();
-                const pollTimer = setInterval(syncData, 500);
-                return () => { clearInterval(pollTimer); if(interval) clearInterval(interval); };
-            }, [gameCode, isSpinning, soundOn]);
-
             useEffect(() => { if(window.lucide) window.lucide.createIcons(); });
 
-            const handleLogout = () => {
-                setShowSettings(false);
-                localStorage.removeItem("cr_started");
-                localStorage.removeItem("cr_game_code");
-                localStorage.removeItem("cr_is_host");
-                localStorage.removeItem("cr_is_spinning");
-                localStorage.removeItem("cr_zone");
-                localStorage.removeItem("cr_last_number");
-                setHasStarted(false);
-                setGameCode("");
-                setIsHost(false);
-                setCurrentSlot(null);
-                setBetSlot(null);
-            };
+            useEffect(() => { localStorage.setItem("cr_zone", zone); }, [zone]);
+            useEffect(() => { 
+                if (currentSlot) localStorage.setItem("cr_last_number", currentSlot);
+                else localStorage.removeItem("cr_last_number");
+            }, [currentSlot]);
 
-            const handleStartRound = () => {
-                localStorage.setItem("cr_started", "true");
-                setHasStarted(true);
-            };
-            
-            const createGame = () => {
-                const code = Math.random().toString(36).substring(2, 6).toUpperCase();
-                localStorage.setItem("cr_game_code", code);
-                localStorage.setItem("cr_is_host", "true");
-                localStorage.setItem("cr_is_spinning", "false");
-                localStorage.setItem("cr_zone", "PAR 4 TEE");
-                localStorage.setItem("cr_last_number", "");
-                
-                setIsHost(true);
-                setZone("PAR 4 TEE");
-                setGameCode(code);
-                setCurrentSlot(null);
-            };
-            
-            const joinGame = (codeInput) => {
-                const code = codeInput.toUpperCase().trim();
-                if(code.length !== 4) return;
-                
-                localStorage.setItem("cr_game_code", code);
-                localStorage.setItem("cr_is_host", "false");
-                
-                setIsHost(false);
-                setGameCode(code);
-                setCurrentSlot(null);
-            };
-            
             const handleSpin = () => {
                 if(isSpinning) return;
-                
-                localStorage.setItem("cr_is_spinning", "true");
-                localStorage.setItem("cr_zone", zone);
-                localStorage.removeItem("cr_last_number");
                 
                 setIsSpinning(true);
                 setCurrentSlot(null);
 
+                if (soundOn) {
+                    spinSound.current.currentTime = 0;
+                    spinSound.current.volume = 0.1;
+                    spinSound.current.play().catch(e=>{});
+                    
+                    const soundInterval = setInterval(() => {
+                        spinSound.current.currentTime = 0;
+                        spinSound.current.play().catch(e=>{});
+                    }, 100);
+                    
+                    setTimeout(() => clearInterval(soundInterval), 3500);
+                }
+
                 setTimeout(() => {
                     const randomIdx = Math.floor(Math.random() * SLOTS.length);
                     const result = SLOTS[randomIdx];
-                    
-                    localStorage.setItem("cr_is_spinning", "false");
-                    localStorage.setItem("cr_last_number", result);
-                    
                     setIsSpinning(false);
                     setCurrentSlot(result);
                 }, 3500); 
@@ -697,12 +578,6 @@
 
             const Header = () => (
                 <div className="header">
-                    {gameCode && (
-                        <div className="room-info-container">
-                            <div className="room-label">ROOM CODE</div>
-                            <div className="room-code">{gameCode}</div>
-                        </div>
-                    )}
                     <img src="./images/logo512.png" className="header-logo" onerror="this.style.display='none'" />
                     <div className="header-right">
                         <button className="header-btn" onClick={() => setShowSettings(true)}>
@@ -712,52 +587,9 @@
                 </div>
             );
 
-            // --- 1. START PAGE ---
-            if (!hasStarted) return (
-                <div className="app-container">
-                    <div className="game-content">
-                        <div className="top-section" style={{flexDirection:'column'}}>
-                            <img src="./images/logo512.png" style={{width:220, height:220, marginBottom:30}} onerror="this.style.display='none'" />
-                            <h1 style={{fontFamily:'var(--font-display)', fontSize:48, lineHeight:1, marginBottom:10, color:'var(--primary)', textAlign:'center'}}>CADDIE<br/>ROULETTE</h1>
-                        </div>
-                        <div className="bottom-section">
-                             <h3 style={{fontSize:16, fontWeight:700, color:'#374151', textTransform:'uppercase', letterSpacing:1, marginBottom:10}}>Your 15th Club</h3>
-                            <p style={{marginBottom:40, color:'#6B7280', fontSize:14, lineHeight:1.6, textAlign:'center', maxWidth:300}}>
-                                Spin for random challenges on the tee, fairway, and green. It won't help your score, but it will change the game.
-                            </p>
-                            <button className="btn btn-primary" onClick={handleStartRound}>START ROUND</button>
-                        </div>
-                    </div>
-                </div>
-            );
-
-            // --- 2. JOIN PAGE ---
-            if (!gameCode) return (
-                <div className="app-container">
-                    <Modal isOpen={modal.open} title={modal.title} message={modal.message} onClose={() => setModal({...modal, open: false})} />
-                    <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} soundOn={soundOn} toggleSound={() => setSoundOn(!soundOn)} onLogout={handleLogout} />
-                    
-                    <Header />
-                    <div className="game-content">
-                        <div className="top-section" style={{flexDirection:'column'}}>
-                            <h2 style={{fontFamily:'var(--font-display)', fontSize:32, color:'#374151', marginBottom:30}}>NEW ROUND?</h2>
-                            <button className="btn btn-primary" onClick={createGame} style={{width:'80%', maxWidth:'300px'}}>CREATE ROOM</button>
-                        </div>
-                        <div className="bottom-section">
-                            <p style={{fontSize:12, fontWeight:800, color:'#9CA3AF', marginBottom:20, letterSpacing:1}}>OR JOIN FRIEND</p>
-                            <input id="codeInput" className="input-lg" placeholder="ENTER CODE" maxLength="4" />
-                            <button className="btn btn-accent" onClick={() => joinGame(document.getElementById('codeInput').value)}>
-                                JOIN ROOM
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            );
-
-            // --- 3. GAME PAGE ---
             return (
                 <div className="app-container">
-                    <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} soundOn={soundOn} toggleSound={() => setSoundOn(!soundOn)} onLogout={handleLogout} />
+                    <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} soundOn={soundOn} toggleSound={() => setSoundOn(!soundOn)} />
                     
                     <Header />
                     <div className="game-content">
@@ -823,23 +655,15 @@
                                         </div>
                                     </div>
 
-                                    {/* HOST CONTROLS OR WAITING MESSAGE */}
-                                    {isHost ? (
-                                        <>
-                                            <div className="zone-selector">
-                                                {Object.keys(CHALLENGES).map(z => (
-                                                    <button key={z} className={`zone-btn ${zone === z ? 'active' : ''}`} onClick={() => setZone(z)}>{z}</button>
-                                                ))}
-                                            </div>
-                                            <button className="btn btn-accent" onClick={handleSpin} disabled={isSpinning} style={{opacity: isSpinning ? 0.6 : 1}}>
-                                                {isSpinning ? 'SPINNING...' : 'SPIN THE WHEEL'}
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <div style={{textAlign:'center', color:'#9CA3AF', fontWeight:800, letterSpacing:1}}>
-                                            {isSpinning ? 'HOST IS SPINNING...' : 'WAITING FOR HOST'}
-                                        </div>
-                                    )}
+                                    {/* CONTROLS */}
+                                    <div className="zone-selector">
+                                        {Object.keys(CHALLENGES).map(z => (
+                                            <button key={z} className={`zone-btn ${zone === z ? 'active' : ''}`} onClick={() => setZone(z)}>{z}</button>
+                                        ))}
+                                    </div>
+                                    <button className="btn btn-accent" onClick={handleSpin} disabled={isSpinning} style={{opacity: isSpinning ? 0.6 : 1}}>
+                                        {isSpinning ? 'SPINNING...' : 'SPIN THE WHEEL'}
+                                    </button>
                                 </>
                             )}
                         </div>
